@@ -12,16 +12,13 @@
             --card-color: #1A1A1A;
             --border-color: #333333;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; }
-        
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
             padding-bottom: 80px;
             min-height: 100vh;
         }
-
         #balance-bar {
             position: sticky;
             top: 0;
@@ -36,9 +33,7 @@
             z-index: 10;
         }
         #balance-bar span { color: var(--accent-pink); }
-
         .section-title { padding: 15px 20px 5px; font-size: 16px; color: #CCC; }
-
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -65,10 +60,8 @@
         }
         .nav-item.active { color: var(--accent-pink); font-weight: bold; }
         .nav-item svg { width: 24px; height: 24px; fill: currentColor; }
-
         .page { display: none; padding: 0 20px; padding-bottom: 20px; }
         .page.active { display: block; }
-
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; font-size: 14px; color: #AAA; margin-bottom: 5px; }
         .form-group input, .form-group select {
@@ -81,7 +74,6 @@
             font-size: 16px;
         }
         .form-group select { appearance: auto; }
-
         .task-item {
             background: var(--card-color);
             padding: 15px;
@@ -103,8 +95,6 @@
             cursor: pointer;
             font-size: 13px;
         }
-
-        /* Статистика (таблица) */
         .stat-row {
             background: var(--card-color);
             border-radius: 12px;
@@ -116,15 +106,12 @@
         }
         .stat-row .label { color: #AAA; }
         .stat-row .value { color: var(--accent-pink); font-weight: bold; }
-
-        /* Админ-панель (видна только тебе) */
         #admin-panel {
-            display: none;
             background: var(--card-color);
             border: 2px solid var(--accent-pink);
             padding: 15px;
             border-radius: 12px;
-            margin: 20px;
+            margin-top: 20px;
         }
         #admin-panel h3 { color: var(--accent-pink); margin-bottom: 10px; }
         .admin-row {
@@ -136,7 +123,6 @@
             color: #AAA;
         }
         .admin-row span { color: #fff; }
-
         .main-btn {
             display: block;
             width: calc(100% - 40px);
@@ -154,21 +140,17 @@
     </style>
 </head>
 <body>
-
     <div id="balance-bar">
         <span>🪙 <span id="user-balance">0</span> Y-Coins</span>
     </div>
 
-    <!-- ЗАДАНИЯ -->
     <div id="page-tasks" class="page active">
         <div class="section-title">🔥 Доступные задания:</div>
         <div id="tasks-grid"></div>
     </div>
 
-    <!-- СТАТИСТИКА с разделением -->
     <div id="page-stats" class="page">
         <div class="section-title">📊 Твоя статистика</div>
-        
         <div class="stat-row">
             <span class="label">✅ Выполнено:</span>
             <span class="value" id="stat-done">0</span>
@@ -181,25 +163,25 @@
             <span class="label">💰 Баланс:</span>
             <span class="value" id="stat-balance">0</span>
         </div>
+        <div id="admin-panel">
+            <h3>🔐 Админ-панель</h3>
+            <div id="admin-list">Заявок пока нет.</div>
+        </div>
     </div>
 
-    <!-- ПОДДЕРЖКА -->
     <div id="page-support" class="page">
         <div class="section-title">🆘 Поддержка</div>
         <button class="main-btn" onclick="window.open('https://t.me/HEDYPA', '_blank')">Написать создателю</button>
     </div>
 
-    <!-- ВЫВОД (с колёсиками для банка и реферала) -->
     <div id="page-withdraw" class="page">
         <div class="section-title">💸 Вывод средств</div>
-        
         <div class="form-group">
             <label>Сумма (Y-Coins)</label>
             <input type="number" id="w-amount" placeholder="Например: 100">
         </div>
-
         <div class="form-group">
-            <label>Какой банк / способ?</label>
+            <label>Куда вывести?</label>
             <select id="w-method">
                 <option value="sbp">СБП (по номеру телефона)</option>
                 <option value="tinkoff">Тинькофф</option>
@@ -207,9 +189,8 @@
                 <option value="alfa">Альфа-Банк</option>
             </select>
         </div>
-
         <div class="form-group">
-            <label>Кто тебя пригласил? (Реферал)</label>
+            <label>Кто тебя пригласил?</label>
             <select id="w-ref">
                 <option value="none">— Самостоятельно —</option>
                 <option value="ref1">Реферал №1</option>
@@ -218,14 +199,7 @@
                 <option value="ref4">Реферал №4</option>
             </select>
         </div>
-
         <button class="main-btn" onclick="submitWithdraw()">📤 Подать заявку</button>
-    </div>
-
-    <!-- АДМИН-ПАНЕЛЬ -->
-    <div id="admin-panel">
-        <h3>🔐 Админ-панель</h3>
-        <div id="admin-list">Заявок пока нет.</div>
     </div>
 
     <div class="bottom-nav">
@@ -262,16 +236,16 @@
         }
         updateUI();
 
-        // ===== 30 ЗАДАНИЙ =====
+        // ===== 30 ЗАДАНИЙ С ОПИСАНИЯМИ =====
         function generateTasks() {
             const grid = document.getElementById('tasks-grid');
             grid.innerHTML = '';
             const tasks = [
-                { name: "Подпишись на канал @YANISY", desc: "Останься на 7 дней", reward: 10 },
-                { name: "Скачай игру Wordscapes", desc: "Установи и открой", reward: 25 },
-                { name: "Пройди опрос о работе", desc: "Ответь на 10 вопросов", reward: 20 },
-                { name: "Подпишись на канал @HEDYPA", desc: "Останься подписанным", reward: 10 },
-                { name: "Зарегистрируйся на сайте", desc: "Пройди простую регистрацию", reward: 30 }
+                { name: "Подпишись на канал YANISY", desc: "Останься в канале на 7 дней", reward: 10 },
+                { name: "Пройди опрос о фильмах", desc: "Ответь на 5 вопросов", reward: 15 },
+                { name: "Скачай игру-головоломку", desc: "Установи и открой приложение", reward: 20 },
+                { name: "Подпишись на канал HEDYPA", desc: "Останься подписанным", reward: 10 },
+                { name: "Зарегистрируйся на сайте", desc: "Пройди простую регистрацию", reward: 25 }
             ];
             for(let i=1; i<=30; i++) {
                 let t = tasks[i % tasks.length];
@@ -290,7 +264,7 @@
         }
         generateTasks();
 
-        // ===== ОТКРЫТИЕ СТЕНЫ =====
+        // ===== ОТКРЫТИЕ СТЕНЫ ЗАДАНИЙ (Твоя ссылка) =====
         function openOfferWall() {
             window.open('https://omg10.com/4/11302575', '_blank');
         }
@@ -309,8 +283,8 @@
             let method = document.getElementById('w-method').value;
             let ref = document.getElementById('w-ref').value;
 
-            if (!amount || amount < 100) return alert('Минимум: 100 Y-Coins');
-            if (amount > balance) return alert('Недостаточно Y-Coins');
+            if (!amount || amount < 100) return alert('❌ Минимум: 100 Y-Coins');
+            if (amount > balance) return alert('❌ Недостаточно Y-Coins');
 
             let req = { amount, method, ref, time: new Date().toLocaleString() };
             withdrawRequests.push(req);
@@ -322,10 +296,11 @@
 
             alert('✅ Заявка отправлена! Ожидай ответа.');
             document.getElementById('w-amount').value = '';
-            showAdminPanel();
+            document.getElementById('w-method').value = 'sbp';
+            document.getElementById('w-ref').value = 'none';
         }
 
-        // ===== АДМИН-ПАНЕЛЬ (только для @HEDYPA) =====
+        // ===== АДМИН-ПАНЕЛЬ (всегда видна, потому что она на странице статистики) =====
         function showAdminPanel() {
             let tgUsername = "";
             if (window.Telegram && window.Telegram.WebApp) {
@@ -337,13 +312,12 @@
                 }
             }
 
+            let list = document.getElementById('admin-list');
             if (tgUsername.toLowerCase() === "hedypa") {
-                document.getElementById('admin-panel').style.display = 'block';
-                let list = document.getElementById('admin-list');
+                list.innerHTML = '';
                 if (withdrawRequests.length === 0) {
                     list.innerHTML = 'Заявок пока нет.';
                 } else {
-                    list.innerHTML = '';
                     withdrawRequests.forEach((r, i) => {
                         list.innerHTML += `<div class="admin-row">
                             <span>${r.amount} Y-Coins</span>
@@ -353,6 +327,8 @@
                         </div>`;
                     });
                 }
+            } else {
+                list.innerHTML = 'Эта панель доступна только создателю.';
             }
         }
         showAdminPanel();
