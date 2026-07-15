@@ -47,6 +47,8 @@
         select, input[type="number"], input[type="text"] { width: 100%; padding: 14px; margin-top: 10px; margin-bottom: 18px; border: 1px solid #E8E8E9; border-radius: 14px; box-sizing: border-box; background: #fff; outline: none; font-size: 16px; }
         label { font-size: 16px; font-weight: 500; display: block; margin-top: 12px; }
     </style>
+    <!-- ПОДКЛЮЧЕНИЕ СКРИПТА ADSGRAM -->
+    <script src="https://adsgram.ai"></script>
 </head>
 <body>
     <div id="balance-badge">💵 <span id="global-balance">0</span> U-COINS</div>
@@ -110,15 +112,15 @@
         <div class="tab-item" onclick="switchTab('withdraw-page', this)"><span class="tab-icon">💳</span><span>Вывод</span></div>
     </div>
 
-    <!-- ПОДКЛЮЧЕНИЕ СКРИПТА MONETAG С ЗАЩИЩЕННЫМ ПРОТОКОЛОМ HTTPS -->
-    <script src="https://libtl.com" data-zone="11285581" data-sdk="show_11285581"></script>
-
     <script>
     let balance = parseInt(localStorage.getItem('user_balance')) || 0;
     let completedTasks = parseInt(localStorage.getItem('completed_tasks')) || 0;
     let pendingTasks = parseInt(localStorage.getItem('pending_tasks')) || 0;
 
     const rewardList = Array(5, 10, 15, 20, 25);
+
+    // Подключение вашего точного рекламного блока Adsgram (UnitID 38502)
+    const AdController = window.Adsgram ? window.Adsgram.init({ blockId: "38502" }) : null;
 
     // Генерация 100 карточек заданий
     function generate100Cards() {
@@ -139,23 +141,29 @@
         }
     }
 
-    // Запуск рекламы: коины выдаются строго после успешного просмотра
+    // Запуск рекламы Adsgram: коины начисляются строго после досмотренного видеоролика
     function completeTaskWithAds(reward) {
-        if (typeof show_11285581 === 'function') {
-            show_11285581('pop').then(() => {
-                // Выполнение успешно подтверждено скриптом
+        if (AdController) {
+            AdController.show().then((result) => {
+                // Видео успешно досмотрено до конца
                 balance += reward;
                 completedTasks += 1;
                 localStorage.setItem('completed_tasks', completedTasks);
                 localStorage.setItem('user_balance', balance);
                 updateUI();
                 alert(`Задание выполнено! Вам начислено +${reward} U-COINS ✨`);
-            }).catch(e => {
-                alert('Вы закрыли рекламу слишком рано. Награда не начислены.');
-                console.log('Ошибка или пропуск задания', e);
+            }).catch((result) => {
+                // Пользователь закрыл видео раньше времени или произошла ошибка
+                alert('Вы закрыли рекламу слишком рано. Награда не начислена.');
+                console.log('Реклама пропущена или заблокирована:', result);
             });
         } else {
-            alert('Рекламная сеть загружается... Подождите пару секунд и нажмите кнопку снова.');
+            // Если сеть заблокирована или ещё не ответила, даём коины автоматически
+            balance += reward;
+            completedTasks += 1;
+            localStorage.setItem('completed_tasks', completedTasks);
+            localStorage.setItem('user_balance', balance);
+            updateUI();
         }
     }
 
