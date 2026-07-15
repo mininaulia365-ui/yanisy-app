@@ -6,6 +6,11 @@
     <title>YANISY Mini App</title>
     <!-- ПОДКЛЮЧЕНИЕ TELEGRAM SDK -->
     <script src="https://telegram.org"></script>
+    <!-- ПОДКЛЮЧЕНИЕ СКРИПТОВ РЕКЛАМНЫХ СЕТЕЙ ИЗ ТЗ -->
+    <script src="https://adsgram.ai"></script>
+    <script src="https://monetag.com" defer></script> 
+    <!-- БОЕВОЕ ПОДКЛЮЧЕНИЕ СТЕНЫ GIGA PUB С ВАШИМ ID 7301 -->
+    <script src="https://giga.pub" async></script>
     <style>
         :root {
             --bg-color: #F8F4FF;
@@ -30,19 +35,24 @@
         #balance-badge span { color: #007AFF; font-weight: bold; }
         .content { flex: 1; padding: 20px; margin-top: 60px; overflow-y: auto; display: none; padding-bottom: 90px; box-sizing: border-box; }
         .content.active { display: block; }
+        
         .welcome-box { background: var(--card-white); padding: 25px; border-radius: 24px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.03); border-left: 5px solid #007AFF; }
         .welcome-box h2 { font-size: 24px; margin-top: 0; }
         .welcome-box p { font-size: 16px; }
-        .btn { display: block; width: 100%; padding: 14px; margin-top: 15px; border: none; border-radius: 14px; font-weight: bold; cursor: pointer; text-decoration: none; text-align: center; box-sizing: border-box; font-size: 16px; }
+        
+        .btn { display: block; width: 100%; padding: 14px; margin-top: 15px; border: none; border-radius: 14px; font-weight: bold; cursor: pointer; text-decoration: none; text-align: center; box-sizing: border-box; font-size: 16px; transition: background 0.2s, transform 0.1s; }
         .btn-blue { background: #007AFF; color: white; }
+        .btn-blue:active { transform: scale(0.98); }
+        .btn:disabled { background: #BDC3C7 !important; color: #7F8C8D !important; cursor: not-allowed; }
+        
         .task-card { background: var(--card-white); padding: 18px; border-radius: 18px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 3px 8px rgba(0,0,0,0.03); }
         .task-card b { font-size: 17px; }
         .task-card span { font-size: 14px; }
-        .task-card .btn { width: auto; margin-top: 0; padding: 10px 20px; background: #007AFF; color: white; font-size: 14px; border-radius: 10px; }
+        .task-card .btn { width: auto; margin-top: 0; padding: 10px 20px; font-size: 14px; border-radius: 10px; }
         
-        /* Стили для блока главной витрины TADS */
         .offerwall-section { display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; }
-        .ow-card { background: var(--card-white); border: 1px solid var(--accent-blue); border-radius: 20px; padding: 16px; display: flex; align-items: center; gap: 16px; cursor: pointer; text-align: left; width: 100%; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
+        .ow-card { background: var(--card-white); border: 1px solid var(--accent-blue); border-radius: 20px; padding: 16px; display: flex; align-items: center; gap: 16px; cursor: pointer; text-align: left; width: 100%; box-shadow: 0 4px 10px rgba(0,0,0,0.02); transition: transform 0.1s; border: none; outline: none; }
+        .ow-card:active { transform: scale(0.98); }
         .ow-icon { font-size: 26px; }
         .ow-info h3 { margin: 0; font-size: 16px; color: var(--text-main); }
         .ow-info p { margin: 4px 0 0 0; font-size: 12px; color: #8E8E93; }
@@ -51,14 +61,17 @@
         .tab-item { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 13px; color: #8E8E93; cursor: pointer; flex: 1; text-align: center; }
         .tab-item.active { color: #007AFF; font-weight: bold; }
         .tab-icon { font-size: 24px; }
-        .stats-table { border-left: 5px solid #007AFF; padding-left: 12px; margin-bottom: 18px; }
-        .stats-table-orange { border-left: 5px solid #FFCC00; padding-left: 12px; margin-bottom: 18px; }
+        
+        .stats-table { border-left: 5px solid #007AFF; padding-left: 12px; margin-bottom: 18px; background: var(--card-white); padding: 12px; border-radius: 0 14px 14px 0; }
+        .stats-table-orange { border-left: 5px solid #FFCC00; padding-left: 12px; margin-bottom: 18px; background: var(--card-white); padding: 12px; border-radius: 0 14px 14px 0; }
         .stats-row { margin: 10px 0; font-size: 16px; }
-        select, input[type="number"], input[type="text"] { width: 100%; padding: 14px; margin-top: 10px; margin-bottom: 18px; border: 1px solid #E8E8E9; border-radius: 14px; box-sizing: border-box; background: #fff; outline: none; font-size: 16px; }
+        
+        select, input[type="number"], input[type="text"] { width: 100%; padding: 14px; margin-top: 10px; margin-bottom: 18px; border: 1px solid #E8E8E9; border-radius: 14px; box-sizing: border-box; background: #fff; outline: none; font-size: 16px; color: var(--text-color); }
         label { font-size: 16px; font-weight: 500; display: block; margin-top: 12px; }
     </style>
 </head>
 <body>
+
     <div id="balance-badge">💵 <span id="global-balance">0</span> U-COINS</div>
 
     <!-- СТРАНИЦА ЗАДАНИЙ -->
@@ -72,7 +85,7 @@
         <div class="offerwall-section">
             <button class="ow-card" onclick="openTads()">
                 <div class="ow-icon">📢</div>
-                <div class="ow-info"><h3>Платформа TADS</h3><p>Подписки на каналы и быстрый запуск ботов</p></div>
+                <div class="ow-info"><h3>Платформа YANISY Offers</h3><p>Подписки на каналы, тесты и задания от GigaPub</p></div>
             </button>
         </div>
 
@@ -101,7 +114,7 @@
         <h2>✉️ Поддержка</h2>
         <div class="welcome-box">
             <p style="font-size: 16px; margin: 0 0 15px 0;">Если у вас есть какие-то вопросы или вы хотели что-то предложить, напишите нам:</p>
-            <button onclick="openSupportLink()" class="btn btn-blue" style="display:inline-block; width:auto;">Написать в поддержку</button>
+            <button onclick="openSupportLink()" class="btn btn-blue" style="display:inline-block; width:auto; margin-top: 0;">Написать в поддержку</button>
         </div>
     </div>
 
@@ -109,8 +122,10 @@
     <div id="withdraw-page" class="content">
         <h2>💳 Вывод средств</h2>
         <p style="font-size: 14px; color: #8E8E93; margin-bottom: 15px;">Минимальная сумма на телефон — 100 ₽. На карту банка — 150 ₽.</p>
+        
         <label>1. Сколько вы хотите вывести:</label>
         <input type="number" id="withdraw-amount" placeholder="Введите сумму U-COINS">
+        
         <label>2. Выберите банк:</label>
         <select id="withdraw-method">
             <option value="sbp">СБП (По номеру телефона)</option>
@@ -118,148 +133,228 @@
             <option value="tinkoff">Т-Банк (Тинькофф)</option>
             <option value="alpha">Альфа-банк</option>
         </select>
+        
         <label>3. От какого вы реферала:</label>
         <select id="withdraw-ref">
             <option value="Реферал 1">Реферал 1</option>
             <option value="Реферал 2">Реферал 2</option>
         </select>
+        
         <label>4. Реквизиты для перевода:</label>
         <input type="text" id="withdraw-wallet" placeholder="Номер карты или телефона для СБП">
+        
         <button class="btn btn-blue" onclick="sendWithdraw()">Коснитесь, чтобы вывести</button>
     </div>
 
     <!-- НИЖНЯЯ ПАНЕЛЬ НАВИГАЦИИ -->
     <div class="tab-bar">
         <div class="tab-item active" onclick="switchTab('tasks-page', this)"><span class="tab-icon">📋</span><span>Задания</span></div>
-        <div class="tab-item" onclick="switchTab('stats-page', this)"><span class="tab-icon">📊</span><span>Статистика</span></div>
+        <div class="tab-item" onclick="statsPageTrigger(this)"><span class="tab-icon">📊</span><span>Статистика</span></div>
         <div class="tab-item" onclick="switchTab('support-page', this)"><span class="tab-icon">📬</span><span>Поддержка</span></div>
         <div class="tab-item" onclick="switchTab('withdraw-page', this)"><span class="tab-icon">💳</span><span>Вывод</span></div>
     </div>
-        <script>
-    let balance = parseInt(localStorage.getItem('user_balance')) || 0;
-    let completedTasks = parseInt(localStorage.getItem('completed_tasks')) || 0;
-    let pendingTasks = parseInt(localStorage.getItem('pending_tasks')) || 0;
-    let tgUserId = "test_user";
 
-    if (window.Telegram && window.Telegram.WebApp) {
-        window.Telegram.WebApp.ready();
-        window.Telegram.WebApp.expand();
-        tgUserId = window.Telegram.WebApp.initDataUnsafe.user?.id || "test_user";
-    }
-
-    const rewardList = Array(15, 18, 20, 22, 25);
-
-    function generate100Cards() {
-        const container = document.getElementById('cards-container');
-        if (!container) return;
-        container.innerHTML = '';
-        for (let i = 1; i <= 100; i++) {
-            let reward = rewardList[i % rewardList.length];
-            container.innerHTML += `
-                <div class="task-card">
-                    <div>
-                        <b style="color: #2C3E50 !important;">Быстрое задание #${i}</b>
-                        <span style="color: #8E8E93 !important; display: block; margin-top: 4px;">Награда: +${reward} U-COINS</span>
-                    </div>
-                    <button class="btn btn-blue" onclick="executeTadsTask(this, ${reward})">Выполнить</button>
-                </div>
-            `;
-        }
-    }
-
-    function executeTadsTask(buttonElement, reward) {
-        buttonElement.disabled = true;
-        buttonElement.innerText = "Запуск...";
-
-        // Исправленное склеивание ссылки и ID пользователя
-        let tadsUrl = "https://tads.me" + tgUserId;
-        
-        if (window.Telegram && window.Telegram.WebApp) {
-            window.Telegram.WebApp.openLink(tadsUrl);
-        } else {
-            window.open(tadsUrl, '_blank');
-        }
-
-        let timeLeft = 15;
-        const interval = setInterval(() => {
-            timeLeft--;
-            buttonElement.innerText = timeLeft + " сек";
-            buttonElement.style.background = '#BDC3C7';
-            
-            if (timeLeft <= 0) {
-                clearInterval(interval);
-                
-                balance += reward;
-                completedTasks += 1;
-                localStorage.setItem('completed_tasks', completedTasks);
-                localStorage.setItem('user_balance', balance);
-                updateUI();
-                
-                buttonElement.innerText = "Готово ✓";
-                buttonElement.style.background = "#2ECC71";
-                buttonElement.disabled = true;
-                
-                alert("Задание проверено платформой TADS! Начислено +" + reward + " U-COINS. ✨");
-            }
-        }, 1000);
-    }
-
-    function openTads() {
-        let tadsUrl = "https://tads.me" + tgUserId;
-        if (window.Telegram && window.Telegram.WebApp) window.Telegram.WebApp.openLink(tadsUrl);
-        else window.open(tadsUrl, '_blank');
-    }
-
-    function switchTab(pageId, element) {
-        document.querySelectorAll('.content').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-        const targetPage = document.getElementById(pageId);
-        if (targetPage) targetPage.classList.add('active');
-        if (element) element.classList.add('active');
-    }
-
-    function updateUI() {
-        const globalBalance = document.getElementById('global-balance');
-        const statCoins = document.getElementById('stat-done-coins');
-        const statCount = document.getElementById('stat-done-count');
-        const statCheck = document.getElementById('stat-check-count');
-        if (globalBalance) globalBalance.innerText = balance;
-        if (statCoins) statCoins.innerText = balance;
-        if (statCount) statCount.innerText = completedTasks + " шт.";
-        if (statCheck) statCheck.innerText = pendingTasks;
-    }
-
-    function sendWithdraw() {
-        let amountInput = document.getElementById('withdraw-amount');
-        let methodInput = document.getElementById('withdraw-method');
-        let refNameInput = document.getElementById('withdraw-ref');
-        let walletInput = document.getElementById('withdraw-wallet');
-        if (!amountInput || !methodInput || !walletInput) return;
-        let amount = parseInt(amountInput.value);
-        let method = methodInput.value;
-        let refName = refNameInput ? refNameInput.value : '';
-        let wallet = walletInput.value.trim();
-        
-        if (isNaN(amount) || amount <= 0 || !wallet) { alert('Пожалуйста, заполните все поля!'); return; }
-        if (amount > balance) { alert('Недостаточно коинов на балансе!'); return; }
-        
-        balance -= amount;
-        localStorage.setItem('user_balance', balance);
-        updateUI();
-        alert("Заявка создана!\nСумма: " + amount + " коинов\nМетод: " + method.toUpperCase() + "\nРеквизиты: " + wallet);
-        amountInput.value = ''; walletInput.value = '';
-    }
-
-    function openSupportLink() {
-        if (window.Telegram && window.Telegram.WebApp) {
-            window.Telegram.WebApp.openTelegramLink('https://t.me');
-        } else {
-            window.open('https://t.me', '_blank');
-        }
-    }
-
-    generate100Cards();
-    updateUI();
-    </script>
+    <!-- ПОДКЛЮЧЕНИЕ ВНЕШНЕГО ФАЙЛА ЛОГИКИ -->
+    <script src="script.js"></script>
 </body>
 </html>
+let balance = parseInt(localStorage.getItem('user_balance')) || 0;
+let completedTasks = parseInt(localStorage.getItem('completed_tasks')) || 0;
+let pendingTasks = parseInt(localStorage.getItem('pending_tasks')) || 0;
+let tgUserId = "test_user";
+
+// Инициализация Telegram SDK
+if (window.Telegram && window.Telegram.WebApp) {
+    window.Telegram.WebApp.ready();
+    window.Telegram.WebApp.expand();
+    tgUserId = window.Telegram.WebApp.initDataUnsafe.user?.id || "test_user";
+}
+
+const rewardList =;
+const PROJECT_ID = "7301"; // ID проекта Giga Pub
+
+// Автоматическая подгрузка скрипта Giga Pub при загрузке страницы
+document.addEventListener('DOMContentLoaded', function() {
+    if (!window.loadOfferWallSDK) {
+        const script = document.createElement('script');
+        script.src = `https://giga.pub{PROJECT_ID}`;
+        script.async = true;
+        document.head.appendChild(script);
+    }
+});
+
+// Генерация карточек для Блока видео-заданий (30 карточек по ТЗ)
+function generate100Cards() {
+    const container = document.getElementById('cards-container');
+    if (!container) return;
+    container.innerHTML = '';
+    for (let i = 1; i <= 30; i++) {
+        let reward = rewardList[i % rewardList.length];
+        container.innerHTML += `
+            <div class="task-card">
+                <div>
+                    <b style="color: #2C3E50 !important;">Быстрое видео-задание #${i}</b>
+                    <span style="color: #34C759 !important; display: block; margin-top: 4px; font-weight: bold;">Награда: +${reward} U-COINS</span>
+                </div>
+                <button class="btn btn-blue" onclick="executeVideoWaterfall(this, ${reward})">Смотреть</button>
+            </div>
+        `;
+    }
+}
+
+// 🛡️ ТРЕХЭТАПНЫЙ КАСКАД СЕТЕЙ И ЗАЩИТА ОТ НАКРУТОК (Adsgram -> Monetag -> Таймер)
+function executeVideoWaterfall(buttonElement, reward) {
+    buttonElement.disabled = true;
+    buttonElement.innerText = "Запуск...";
+
+    const AdController = window.Adsgram ? window.Adsgram.createAdListener({ blockId: "38502" }) : null;
+    
+    if (AdController) {
+        AdController.show().then(() => {
+            rewardUser(buttonElement, reward);
+        }).catch((err) => {
+            console.log("Adsgram сбой, переход на Monetag...", err);
+            tryMonetag(buttonElement, reward);
+        });
+    } else {
+        tryMonetag(buttonElement, reward);
+    }
+}
+
+function tryMonetag(buttonElement, reward) {
+    if (typeof window.monetagOpenAd !== 'undefined') {
+        window.monetagOpenAd({
+            zoneId: 11285581,
+            onAdCompleted: () => { rewardUser(buttonElement, reward); },
+            onAdDismissed: () => {
+                buttonElement.disabled = false;
+                buttonElement.innerText = "Смотреть";
+                alert("Видео закрыто раньше времени!");
+            },
+            onAdError: () => { runAntiCheatTimer(buttonElement, reward); }
+        });
+    } else {
+        runAntiCheatTimer(buttonElement, reward);
+    }
+}
+
+function runAntiCheatTimer(buttonElement, reward) {
+    let timeLeft = 15;
+    buttonElement.innerText = timeLeft + " сек";
+    buttonElement.style.background = '#BDC3C7';
+
+    const interval = setInterval(() => {
+        timeLeft--;
+        buttonElement.innerText = timeLeft + " сек";
+        
+        if (timeLeft <= 0) {
+            clearInterval(interval);
+            rewardUser(buttonElement, reward);
+            
+            setTimeout(() => {
+                let refUrl = "https://t.me";
+                if (window.Telegram && window.Telegram.WebApp) window.Telegram.WebApp.openTelegramLink(refUrl);
+                else window.open(refUrl, '_blank');
+            }, 500);
+        }
+    }, 1000);
+}
+
+// Функция начисления коинов на баланс
+function rewardUser(buttonElement, reward) {
+    balance += reward;
+    completedTasks += 1;
+    localStorage.setItem('completed_tasks', completedTasks);
+    localStorage.setItem('user_balance', balance);
+    updateUI();
+    
+    buttonElement.innerText = "Готово ✓";
+    buttonElement.style.background = "#2ECC71";
+    buttonElement.disabled = true;
+    
+    if (window.Telegram && window.Telegram.WebApp) {
+        window.Telegram.WebApp.showAlert("Начислено +" + reward + " U-COINS! ✨");
+    } else {
+        alert("Начислено +" + reward + " U-COINS! ✨");
+    }
+}
+
+// 📢 ОТКРЫТИЕ БОЕВОЙ СТЕНЫ GIGAPUB (СВЯЗКА С TG_USER_ID)
+function openTads() {
+    if (window.GigaPubWall && typeof window.GigaPubWall.show === 'function') {
+        window.GigaPubWall.show({
+            subId: tgUserId
+        });
+    } else {
+        let fallbackUrl = `https://giga.pub{PROJECT_ID}?subId=${tgUserId}`;
+        if (window.Telegram && window.Telegram.WebApp) window.Telegram.WebApp.openLink(fallbackUrl);
+        else window.open(fallbackUrl, '_blank');
+    }
+}
+
+// Навигация по вкладкам
+function switchTab(pageId, element) {
+    document.querySelectorAll('.content').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+    const targetPage = document.getElementById(pageId);
+    if (targetPage) targetPage.classList.add('active');
+    if (element) element.classList.add('active');
+}
+
+// Обновление цифр при переключении на статистику
+function statsPageTrigger(element) {
+    updateUI();
+    switchTab('stats-page', element);
+}
+
+// Синхронизация данных с экраном
+function updateUI() {
+    const globalBalance = document.getElementById('global-balance');
+    const statCoins = document.getElementById('stat-done-coins');
+    const statCount = document.getElementById('stat-done-count');
+    const statCheck = document.getElementById('stat-check-count');
+    if (globalBalance) globalBalance.innerText = balance;
+    if (statCoins) statCoins.innerText = balance;
+    if (statCount) statCount.innerText = completedTasks + " шт.";
+    if (statCheck) statCheck.innerText = pendingTasks;
+}
+
+// Валидация вывода коинов
+function sendWithdraw() {
+    let amountInput = document.getElementById('withdraw-amount');
+    let methodInput = document.getElementById('withdraw-method');
+    let refNameInput = document.getElementById('withdraw-ref');
+    let walletInput = document.getElementById('withdraw-wallet');
+    if (!amountInput || !methodInput || !walletInput) return;
+    let amount = parseInt(amountInput.value);
+    let method = methodInput.value;
+    let refName = refNameInput ? refNameInput.value : '';
+    let wallet = walletInput.value.trim();
+    
+    if (isNaN(amount) || amount <= 0 || !wallet) { alert('Пожалуйста, заполните все поля!'); return; }
+    if (amount > balance) { alert('Недостаточно коинов на балансе!'); return; }
+    
+    balance -= amount;
+    pendingTasks += 1;
+    localStorage.setItem('user_balance', balance);
+    localStorage.setItem('pending_tasks', pendingTasks);
+    updateUI();
+    
+    let msg = "Заявка создана!\nСумма: " + amount + " коинов\nМетод: " + method.toUpperCase() + "\nРеквизиты: " + wallet;
+    if (window.Telegram && window.Telegram.WebApp) window.Telegram.WebApp.showAlert(msg);
+    else alert(msg);
+    
+    amountInput.value = ''; walletInput.value = '';
+}
+
+// Ссылка поддержки
+function openSupportLink() {
+    let url = 'https://t.me';
+    if (window.Telegram && window.Telegram.WebApp) window.Telegram.WebApp.openTelegramLink(url);
+    else window.open(url, '_blank');
+}
+
+// Запуск приложения
+generate100Cards();
+updateUI();
+        
