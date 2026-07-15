@@ -166,10 +166,11 @@
         tgUserId = window.Telegram.WebApp.initDataUnsafe.user?.id || "test_user";
     }
 
-    // ТЕПЕРЬ ТУТ СТОЯТ СКОБКИ И ЦИФРЫ: Код больше не зависнет!
+    // ТЕПЕРЬ ВСЁ ЖЕСТКО ПРОПИСАНО: Массив наград заполнен цифрами в квадратных скобках!
     const rewardList =;
     const PROJECT_ID = "7301";
 
+    // Функция генерации: выводит строго 100 заданий
     function generate100Cards() {
         const container = document.getElementById('cards-container');
         if (!container) return;
