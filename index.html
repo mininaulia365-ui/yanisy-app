@@ -144,8 +144,9 @@
 
     <div class="balance-badge">🌟 <span id="global-balance">0</span> U-COINS</div>
 
-    <!-- 1. ЗАЗАНИЯ -->
+    <!-- 1. ЗАДАНИЯ -->
     <div id="tasks-page" class="content active">
+        <!-- ТВОЙ ТЕКСТ ПО ЦЕНТРУ -->
         <div class="welcome-box" style="margin-bottom: 25px;">
             <h2 style="margin-top:0; color:#007AFF;">Привет! ✨</h2>
             <p style="font-size: 16px; line-height: 1.5; margin: 0;">Я очень рада, что ты посетил мой мини-аппс. Вот тебе приветственный бонус <b>30 коинов</b>.</p>
@@ -153,36 +154,8 @@
 
         <h3 style="margin-left: 5px;">🔥 Доступные задания:</h3>
         
-        <div class="task-card">
-            <div>
-                <b style="font-size:15px; display:block;">Быстрое задание #1</b>
-                <span style="font-size:13px; color:#8E8E93;">Награда: +15 U-COINS</span>
-            </div>
-            <a href="https://omg10.com" target="_blank" class="btn" onclick="completeTaskSimulate(15)">Выполнить</a>
-        </div>
-                <div class="task-card">
-            <div>
-                <b style="font-size:15px; display:block;">Новое задание #2</b>
-                <span style="font-size:13px; color:#8E8E93;">Награда: +20 U-COINS</span>
-            </div>
-            <a href="https://omg10.com" target="_blank" class="btn" onclick="completeTaskSimulate(20)">Выполнить</a>
-        </div>
-
-        <div class="task-card">
-            <div>
-                <b style="font-size:15px; display:block;">Свежее задание #3</b>
-                <span style="font-size:13px; color:#8E8E93;">Награда: +25 U-COINS</span>
-            </div>
-            <a href="https://omg10.com" target="_blank" class="btn" onclick="completeTaskSimulate(25)">Выполнить</a>
-        </div>
-
-        <div class="task-card">
-            <div>
-                <b style="font-size:15px; display:block;">Бонусное задание #4</b>
-                <span style="font-size:13px; color:#8E8E93;">Награда: +15 U-COINS</span>
-            </div>
-            <a href="https://omg10.com" target="_blank" class="btn" onclick="completeTaskSimulate(15)">Выполнить</a>
-        </div>
+        <!-- Сюда скрипт автоматически нарисует СТО карточек заданий -->
+        <div id="cards-container"></div>
         
         <p style="text-align:center; color:#8E8E93; font-size:13px; margin-top:20px;">Задания обновляются каждый день автоматически! ✨</p>
     </div>
@@ -256,19 +229,43 @@
         let userSource = localStorage.getItem('user_source') || '';
         let hasEntered = localStorage.getItem('has_entered') || 'false';
 
-        // Твои 4 промокода для админов
         const validPromos = ['косметичка', 'птичка', 'ириска', 'малинка'];
+
+        // Автоматический генератор СТО КАРТОЧЕК с твоей ссылкой Monetag
+        function generate100Cards() {
+            const container = document.getElementById('cards-container');
+            if(!container) return;
+            container.innerHTML = '';
+            
+            const rewards =; // Варианты наград для разнообразия коинов
+            
+            for (let i = 1; i <= 100; i++) {
+                let reward = rewards[i % rewards.length];
+                container.innerHTML += `
+                    <div class="task-card">
+                        <div>
+                            <b style="font-size:15px; display:block;">Быстрое задание #${i}</b>
+                            <span style="font-size:13px; color:#8E8E93;">Награда: +${reward} U-COINS</span>
+                        </div>
+                        <a href="https://omg10.com" target="_blank" class="btn" onclick="completeTaskSimulate(${reward})">Выполнить</a>
+                    </div>
+                `;
+            }
+        }
 
         if (hasEntered === 'true') {
             document.getElementById('promo-overlay').style.display = 'none';
             updateUI();
         }
+        
+        // Запускаем генерацию ровно 100 карточек!
+        generate100Cards();
 
         function checkPromoCode() {
             let input = document.getElementById('promo-input').value.trim().toLowerCase();
             
             if (validPromos.includes(input)) {
-                balance = 30; // Начисляем приветственный бонус
+                balance = 30;
                 userSource = input;
                 hasEntered = 'true';
                 
