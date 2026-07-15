@@ -6,7 +6,7 @@
     <title>YANISY Mini App</title>
     <!-- ПОДКЛЮЧЕНИЕ TELEGRAM SDK -->
     <script src="https://telegram.org"></script>
-    <!-- ИНСТРУКЦИЯ (ШАГ 1): ОФИЦИАЛЬНЫЙ ТЕГ ЗАГРУЗКИ СКРИПТА С ВАШИМ ID 7301 -->
+    <!-- ШАГ 1 ИЗ ИНСТРУКЦИИ: ПОДКЛЮЧЕНИЕ ОФИЦИАЛЬНОГО СКРИПТА С ВАШИМ ID 7301 -->
     <script src="https://giga.pub" async></script>
     <style>
         :root {
@@ -150,10 +150,11 @@
         tgUserId = window.Telegram.WebApp.initDataUnsafe.user?.id || "test_user";
     }
 
-    const rewardList = Array(15, 18, 20, 22, 25);
+    // ИСПРАВЛЕНО: Массив наград теперь написан синтаксически верно
+    const rewardList =;
     const PROJECT_ID = "7301";
 
-    // ИНСТРУКЦИЯ (ШАГ 2): Автоматическая безопасная инициализация SDK GigaPub
+    // ШАГ 2 ИЗ ИНСТРУКЦИИ: Асинхронное подключение нативного SDK
     window.loadGigaSDKCallbacks = window.loadGigaSDKCallbacks || [];
     window.loadGigaSDKCallbacks.push(() => {
         window.loadOfferWallSDK({
@@ -162,11 +163,10 @@
         .then(sdk => {
             window.gigaOfferWallSDK = sdk;
 
-            // Ловим событие rewardClaim прямо из вашей инструкции
+            // Ловим событие rewardClaim прямо из официального руководства
             sdk.on('rewardClaim', async (data) => {
                 console.log('Награда зафиксирована:', data);
                 
-                // Начисляем U-COINS пользователю на баланс
                 let earnedAmount = parseInt(data.amount) || 20;
                 balance += earnedAmount;
                 completedTasks += 1;
@@ -175,12 +175,10 @@
                 localStorage.setItem('completed_tasks', completedTasks);
                 updateUI();
 
-                // Показываем официальное уведомление в Telegram
                 if (window.Telegram && window.Telegram.WebApp) {
                     window.Telegram.WebApp.showAlert(`✨ Задание выполнено! Тебе зачислено +${earnedAmount} U-COINS.`);
                 }
 
-                // Подтверждаем получение награды для GigaPub
                 sdk.confirmReward(data.rewardId, data.hash);
             });
         })
@@ -189,8 +187,6 @@
         });
     });
 
-    // ШАГ 3 ИЗ ИНСТРУКЦИИ: Функция правильного нативного открытия стены
-    // НА 100% ОЧИЩЕНО: Нет никаких опечаток доменов и пустых строк
     function openOfferWall() {
         if (window.gigaOfferWallSDK) {
             window.gigaOfferWallSDK.open();
@@ -199,7 +195,6 @@
         }
     }
 
-    // Генерация ровно 100 карточек заданий из вашего исходника
     function generate100Cards() {
         const container = document.getElementById('cards-container');
         if (!container) return;
@@ -231,6 +226,7 @@
         switchTab('stats-page', element);
     }
 
+    // Синхронизация данных с экраном
     function updateUI() {
         const globalBalance = document.getElementById('global-balance');
         const statCoins = document.getElementById('stat-done-coins');
