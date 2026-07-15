@@ -153,208 +153,186 @@
         <div class="tab-item" onclick="switchTab('support-page', this)"><span class="tab-icon">📬</span><span>Поддержка</span></div>
         <div class="tab-item" onclick="switchTab('withdraw-page', this)"><span class="tab-icon">💳</span><span>Вывод</span></div>
     </div>
+        <!-- ВСЯ ВНУТРЕННЯЯ ЛОГИКА -->
+    <script>
+    let balance = parseInt(localStorage.getItem('user_balance')) || 0;
+    let completedTasks = parseInt(localStorage.getItem('completed_tasks')) || 0;
+    let pendingTasks = parseInt(localStorage.getItem('pending_tasks')) || 0;
+    let tgUserId = "test_user";
 
-    <!-- ПОДКЛЮЧЕНИЕ ВНЕШНЕГО ФАЙЛА ЛОГИКИ -->
-    <script src="script.js"></script>
+    if (window.Telegram && window.Telegram.WebApp) {
+        window.Telegram.WebApp.ready();
+        window.Telegram.WebApp.expand();
+        tgUserId = window.Telegram.WebApp.initDataUnsafe.user?.id || "test_user";
+    }
+
+    const rewardList =;
+    const PROJECT_ID = "7301";
+
+    function generate100Cards() {
+        const container = document.getElementById('cards-container');
+        if (!container) return;
+        container.innerHTML = '';
+        for (let i = 1; i <= 30; i++) {
+            let reward = rewardList[i % rewardList.length];
+            container.innerHTML += `
+                <div class="task-card">
+                    <div>
+                        <b style="color: #2C3E50 !important;">Быстрое видео-задание #${i}</b>
+                        <span style="color: #34C759 !important; display: block; margin-top: 4px; font-weight: bold;">Награда: +${reward} U-COINS</span>
+                    </div>
+                    <button class="btn btn-blue" onclick="executeVideoWaterfall(this, ${reward})">Смотреть</button>
+                </div>
+            `;
+        }
+    }
+
+    function executeVideoWaterfall(buttonElement, reward) {
+        buttonElement.disabled = true;
+        buttonElement.innerText = "Запуск...";
+
+        const AdController = window.Adsgram ? window.Adsgram.createAdListener({ blockId: "38502" }) : null;
+        
+        if (AdController) {
+            AdController.show().then(() => {
+                rewardUser(buttonElement, reward);
+            }).catch((err) => {
+                console.log("Adsgram сбой, переход на Monetag...", err);
+                tryMonetag(buttonElement, reward);
+            });
+        } else {
+            tryMonetag(buttonElement, reward);
+        }
+    }
+
+    function tryMonetag(buttonElement, reward) {
+        if (typeof window.monetagOpenAd !== 'undefined') {
+            window.monetagOpenAd({
+                zoneId: 11285581,
+                onAdCompleted: () => { rewardUser(buttonElement, reward); },
+                onAdDismissed: () => {
+                    buttonElement.disabled = false;
+                    buttonElement.innerText = "Смотреть";
+                    alert("Видео закрыто раньше времени!");
+                },
+                onAdError: () => { runAntiCheatTimer(buttonElement, reward); }
+            });
+        } else {
+            runAntiCheatTimer(buttonElement, reward);
+        }
+    }
+
+    function runAntiCheatTimer(buttonElement, reward) {
+        let timeLeft = 15;
+        buttonElement.innerText = timeLeft + " сек";
+        buttonElement.style.background = '#BDC3C7';
+
+        const interval = setInterval(() => {
+            timeLeft--;
+            buttonElement.innerText = timeLeft + " сек";
+            
+            if (timeLeft <= 0) {
+                clearInterval(interval);
+                rewardUser(buttonElement, reward);
+                
+                setTimeout(() => {
+                    let refUrl = "https://t.me";
+                    if (window.Telegram && window.Telegram.WebApp) window.Telegram.WebApp.openTelegramLink(refUrl);
+                    else window.open(refUrl, '_blank');
+                }, 500);
+            }
+        }, 1000);
+    }
+
+    function rewardUser(buttonElement, reward) {
+        balance += reward;
+        completedTasks += 1;
+        localStorage.setItem('completed_tasks', completedTasks);
+        localStorage.setItem('user_balance', balance);
+        updateUI();
+        
+        buttonElement.innerText = "Готово ✓";
+        buttonElement.style.background = "#2ECC71";
+        buttonElement.disabled = true;
+        
+        if (window.Telegram && window.Telegram.WebApp) {
+            window.Telegram.WebApp.showAlert("Начислено +" + reward + " U-COINS! ✨");
+        } else {
+            alert("Начислено +" + reward + " U-COINS! ✨");
+        }
+    }
+
+    function openTads() {
+        if (window.GigaPubWall && typeof window.GigaPubWall.show === 'function') {
+            window.GigaPubWall.show({
+                subId: tgUserId
+            });
+        } else {
+            let fallbackUrl = `https://giga.pub{PROJECT_ID}?subId=${tgUserId}`;
+            if (window.Telegram && window.Telegram.WebApp) window.Telegram.WebApp.openLink(fallbackUrl);
+            else window.open(fallbackUrl, '_blank');
+        }
+    }
+
+    function switchTab(pageId, element) {
+        document.querySelectorAll('.content').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+        const targetPage = document.getElementById(pageId);
+        if (targetPage) targetPage.classList.add('active');
+        if (element) element.classList.add('active');
+    }
+
+    function statsPageTrigger(element) {
+        updateUI();
+        switchTab('stats-page', element);
+    }
+
+    function updateUI() {
+        const globalBalance = document.getElementById('global-balance');
+        const statCoins = document.getElementById('stat-done-coins');
+        const statCount = document.getElementById('stat-done-count');
+        const statCheck = document.getElementById('stat-check-count');
+        if (globalBalance) globalBalance.innerText = balance;
+        if (statCoins) statCoins.innerText = balance;
+        if (statCount) statCount.innerText = completedTasks + " шт.";
+        if (statCheck) statCheck.innerText = pendingTasks;
+    }
+
+    function sendWithdraw() {
+        let amountInput = document.getElementById('withdraw-amount');
+        let methodInput = document.getElementById('withdraw-method');
+        let refNameInput = document.getElementById('withdraw-ref');
+        let walletInput = document.getElementById('withdraw-wallet');
+        if (!amountInput || !methodInput || !walletInput) return;
+        let amount = parseInt(amountInput.value);
+        let method = methodInput.value;
+        let refName = refNameInput ? refNameInput.value : '';
+        let wallet = walletInput.value.trim();
+        
+        if (isNaN(amount) || amount <= 0 || !wallet) { alert('Пожалуйста, заполните все поля!'); return; }
+        if (amount > balance) { alert('Недостаточно коинов на балансе!'); return; }
+        
+        balance -= amount;
+        pendingTasks += 1;
+        localStorage.setItem('user_balance', balance);
+        localStorage.setItem('pending_tasks', pendingTasks);
+        updateUI();
+        
+        let msg = "Заявка создана!\nСумма: " + amount + " коинов\nМетод: " + method.toUpperCase() + "\nРеквизиты: " + wallet;
+        if (window.Telegram && window.Telegram.WebApp) window.Telegram.WebApp.showAlert(msg);
+        else alert(msg);
+        
+        amountInput.value = ''; walletInput.value = '';
+    }
+
+    function openSupportLink() {
+        let url = 'https://t.me';
+        if (window.Telegram && window.Telegram.WebApp) window.Telegram.WebApp.openTelegramLink(url);
+        else window.open(url, '_blank');
+    }
+
+    generate100Cards();
+    updateUI();
+    </script>
 </body>
 </html>
-let balance = parseInt(localStorage.getItem('user_balance')) || 0;
-let completedTasks = parseInt(localStorage.getItem('completed_tasks')) || 0;
-let pendingTasks = parseInt(localStorage.getItem('pending_tasks')) || 0;
-let tgUserId = "test_user";
-
-// Инициализация Telegram SDK
-if (window.Telegram && window.Telegram.WebApp) {
-    window.Telegram.WebApp.ready();
-    window.Telegram.WebApp.expand();
-    tgUserId = window.Telegram.WebApp.initDataUnsafe.user?.id || "test_user";
-}
-
-const rewardList =;
-const PROJECT_ID = "7301"; // ID проекта Giga Pub
-
-// Автоматическая подгрузка скрипта Giga Pub при загрузке страницы
-document.addEventListener('DOMContentLoaded', function() {
-    if (!window.loadOfferWallSDK) {
-        const script = document.createElement('script');
-        script.src = `https://giga.pub{PROJECT_ID}`;
-        script.async = true;
-        document.head.appendChild(script);
-    }
-});
-
-// Генерация карточек для Блока видео-заданий (30 карточек по ТЗ)
-function generate100Cards() {
-    const container = document.getElementById('cards-container');
-    if (!container) return;
-    container.innerHTML = '';
-    for (let i = 1; i <= 30; i++) {
-        let reward = rewardList[i % rewardList.length];
-        container.innerHTML += `
-            <div class="task-card">
-                <div>
-                    <b style="color: #2C3E50 !important;">Быстрое видео-задание #${i}</b>
-                    <span style="color: #34C759 !important; display: block; margin-top: 4px; font-weight: bold;">Награда: +${reward} U-COINS</span>
-                </div>
-                <button class="btn btn-blue" onclick="executeVideoWaterfall(this, ${reward})">Смотреть</button>
-            </div>
-        `;
-    }
-}
-
-// 🛡️ ТРЕХЭТАПНЫЙ КАСКАД СЕТЕЙ И ЗАЩИТА ОТ НАКРУТОК (Adsgram -> Monetag -> Таймер)
-function executeVideoWaterfall(buttonElement, reward) {
-    buttonElement.disabled = true;
-    buttonElement.innerText = "Запуск...";
-
-    const AdController = window.Adsgram ? window.Adsgram.createAdListener({ blockId: "38502" }) : null;
-    
-    if (AdController) {
-        AdController.show().then(() => {
-            rewardUser(buttonElement, reward);
-        }).catch((err) => {
-            console.log("Adsgram сбой, переход на Monetag...", err);
-            tryMonetag(buttonElement, reward);
-        });
-    } else {
-        tryMonetag(buttonElement, reward);
-    }
-}
-
-function tryMonetag(buttonElement, reward) {
-    if (typeof window.monetagOpenAd !== 'undefined') {
-        window.monetagOpenAd({
-            zoneId: 11285581,
-            onAdCompleted: () => { rewardUser(buttonElement, reward); },
-            onAdDismissed: () => {
-                buttonElement.disabled = false;
-                buttonElement.innerText = "Смотреть";
-                alert("Видео закрыто раньше времени!");
-            },
-            onAdError: () => { runAntiCheatTimer(buttonElement, reward); }
-        });
-    } else {
-        runAntiCheatTimer(buttonElement, reward);
-    }
-}
-
-function runAntiCheatTimer(buttonElement, reward) {
-    let timeLeft = 15;
-    buttonElement.innerText = timeLeft + " сек";
-    buttonElement.style.background = '#BDC3C7';
-
-    const interval = setInterval(() => {
-        timeLeft--;
-        buttonElement.innerText = timeLeft + " сек";
-        
-        if (timeLeft <= 0) {
-            clearInterval(interval);
-            rewardUser(buttonElement, reward);
-            
-            setTimeout(() => {
-                let refUrl = "https://t.me";
-                if (window.Telegram && window.Telegram.WebApp) window.Telegram.WebApp.openTelegramLink(refUrl);
-                else window.open(refUrl, '_blank');
-            }, 500);
-        }
-    }, 1000);
-}
-
-// Функция начисления коинов на баланс
-function rewardUser(buttonElement, reward) {
-    balance += reward;
-    completedTasks += 1;
-    localStorage.setItem('completed_tasks', completedTasks);
-    localStorage.setItem('user_balance', balance);
-    updateUI();
-    
-    buttonElement.innerText = "Готово ✓";
-    buttonElement.style.background = "#2ECC71";
-    buttonElement.disabled = true;
-    
-    if (window.Telegram && window.Telegram.WebApp) {
-        window.Telegram.WebApp.showAlert("Начислено +" + reward + " U-COINS! ✨");
-    } else {
-        alert("Начислено +" + reward + " U-COINS! ✨");
-    }
-}
-
-// 📢 ОТКРЫТИЕ БОЕВОЙ СТЕНЫ GIGAPUB (СВЯЗКА С TG_USER_ID)
-function openTads() {
-    if (window.GigaPubWall && typeof window.GigaPubWall.show === 'function') {
-        window.GigaPubWall.show({
-            subId: tgUserId
-        });
-    } else {
-        let fallbackUrl = `https://giga.pub{PROJECT_ID}?subId=${tgUserId}`;
-        if (window.Telegram && window.Telegram.WebApp) window.Telegram.WebApp.openLink(fallbackUrl);
-        else window.open(fallbackUrl, '_blank');
-    }
-}
-
-// Навигация по вкладкам
-function switchTab(pageId, element) {
-    document.querySelectorAll('.content').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-    const targetPage = document.getElementById(pageId);
-    if (targetPage) targetPage.classList.add('active');
-    if (element) element.classList.add('active');
-}
-
-// Обновление цифр при переключении на статистику
-function statsPageTrigger(element) {
-    updateUI();
-    switchTab('stats-page', element);
-}
-
-// Синхронизация данных с экраном
-function updateUI() {
-    const globalBalance = document.getElementById('global-balance');
-    const statCoins = document.getElementById('stat-done-coins');
-    const statCount = document.getElementById('stat-done-count');
-    const statCheck = document.getElementById('stat-check-count');
-    if (globalBalance) globalBalance.innerText = balance;
-    if (statCoins) statCoins.innerText = balance;
-    if (statCount) statCount.innerText = completedTasks + " шт.";
-    if (statCheck) statCheck.innerText = pendingTasks;
-}
-
-// Валидация вывода коинов
-function sendWithdraw() {
-    let amountInput = document.getElementById('withdraw-amount');
-    let methodInput = document.getElementById('withdraw-method');
-    let refNameInput = document.getElementById('withdraw-ref');
-    let walletInput = document.getElementById('withdraw-wallet');
-    if (!amountInput || !methodInput || !walletInput) return;
-    let amount = parseInt(amountInput.value);
-    let method = methodInput.value;
-    let refName = refNameInput ? refNameInput.value : '';
-    let wallet = walletInput.value.trim();
-    
-    if (isNaN(amount) || amount <= 0 || !wallet) { alert('Пожалуйста, заполните все поля!'); return; }
-    if (amount > balance) { alert('Недостаточно коинов на балансе!'); return; }
-    
-    balance -= amount;
-    pendingTasks += 1;
-    localStorage.setItem('user_balance', balance);
-    localStorage.setItem('pending_tasks', pendingTasks);
-    updateUI();
-    
-    let msg = "Заявка создана!\nСумма: " + amount + " коинов\nМетод: " + method.toUpperCase() + "\nРеквизиты: " + wallet;
-    if (window.Telegram && window.Telegram.WebApp) window.Telegram.WebApp.showAlert(msg);
-    else alert(msg);
-    
-    amountInput.value = ''; walletInput.value = '';
-}
-
-// Ссылка поддержки
-function openSupportLink() {
-    let url = 'https://t.me';
-    if (window.Telegram && window.Telegram.WebApp) window.Telegram.WebApp.openTelegramLink(url);
-    else window.open(url, '_blank');
-}
-
-// Запуск приложения
-generate100Cards();
-updateUI();
-        
