@@ -2,10 +2,153 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- ЖЕСТКО БЛОКИРУЕМ МАСШТАБ, ЧТОБЫ ЭКРАН НЕ СЪЕЗЖАЛ -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>YANISY Mini App</title>
-                <input type="text" id="promo-input" placeholder="Введите промокод..." style="text-align:center; font-weight:bold; text-transform:lowercase;">
-            <button class="btn" style="width:100%; margin-top:15px; background:#007AFF; color:white;" onclick="checkPromoCode()">Активировать</button>
+    <style>
+        :root {
+            --bg-color: #F0F4FF !important;       /* Светло-голубой пастельный фон */
+            --text-color: #2C3E50 !important;     /* Темно-серый мягкий текст */
+            --accent-pink: #FFF0F5 !important;    /* Нежно-розовый пастельный для плашек */
+            --accent-blue: #E0F2FE !important;    /* Пастельно-синий для кнопок */
+            --card-white: #FFFFFF !important;     /* Белый для карточек */
+            --text-main: #333333 !important;
+        }
+        
+        /* Принудительно отключаем темную тему Telegram, чтобы всегда было светло */
+        html, body {
+            background-color: var(--bg-color) !important;
+            color: var(--text-color) !important;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0; padding: 0;
+            display: flex; flex-direction: column; 
+            height: 100vh; overflow: hidden;
+        }
+
+        /* Окно ввода промокода строго по центру экрана */
+        #promo-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: var(--bg-color) !important;
+            z-index: 20000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* Постоянная плашка баланса в левом верхнем углу */
+        .balance-badge {
+            position: fixed;
+            top: 15px; left: 15px;
+            background: var(--card-white) !important;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+            box-shadow: 0 4px 10px rgba(0, 122, 255, 0.08);
+            border: 1px solid var(--accent-blue) !important;
+            z-index: 10000;
+            display: flex; align-items: center; gap: 5px;
+            color: var(--text-color) !important;
+        }
+        .balance-badge span { color: #007AFF !important; }
+
+        .content { 
+            flex: 1; 
+            padding: 20px; 
+            margin-top: 50px; 
+            overflow-y: auto; 
+            display: none; 
+            padding-bottom: 90px; 
+            box-sizing: border-box;
+        }
+        .content.active { display: block !important; }
+
+        .welcome-box {
+            background: var(--card-white) !important;
+            padding: 25px;
+            border-radius: 24px;
+            text-align: center;
+            margin-top: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.03);
+            border: 2px solid var(--accent-pink) !important;
+            color: var(--text-color) !important;
+        }
+        
+        .btn {
+            background-color: var(--accent-blue) !important;
+            color: var(--text-main) !important;
+            border: none;
+            padding: 12px 20px; border-radius: 14px;
+            font-size: 14px; font-weight: 600; cursor: pointer;
+            text-align: center; text-decoration: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+            display: inline-block;
+            box-sizing: border-box;
+        }
+        .btn:active { background-color: #D0E7FF !important; }
+        
+        .task-card {
+            background: var(--card-white) !important; 
+            padding: 18px; 
+            border-radius: 20px; 
+            margin-bottom: 12px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border: 1px solid var(--accent-pink) !important;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.01);
+        }
+
+        .stats-table {
+            background: var(--card-white) !important;
+            border-radius: 16px;
+            padding: 15px;
+            margin-top: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        }
+        .stats-row {
+            display: flex; justify-content: space-between;
+            padding: 10px 0; border-bottom: 1px solid #F2F2F7;
+        }
+        .stats-row:last-child { border-bottom: none; }
+
+        input, select {
+            width: 100%; padding: 14px; margin-top: 10px; box-sizing: border-box;
+            background: var(--card-white) !important; border: 1px solid #E5E5EA; 
+            color: #000 !important; border-radius: 14px; font-size: 15px;
+        }
+
+        .tab-bar {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            display: flex; 
+            border-top: 1px solid #E5E5EA;
+            background-color: rgba(255, 255, 255, 0.9) !important;
+            backdrop-filter: blur(20px);
+            padding-bottom: env(safe-area-inset-bottom);
+            z-index: 9999;
+        }
+        .tab-item {
+            flex: 1; text-align: center; padding: 12px 0; cursor: pointer;
+            font-size: 11px; color: #8E8E93 !important; display: flex; flex-direction: column; align-items: center; gap: 4px;
+        }
+        .tab-item.active { color: #007AFF !important; font-weight: bold; }
+        .tab-icon { font-size: 20px; }
+    </style>
+</head>
+<body>
+
+    <!-- ОКНО ВВОДА ПРОМОКОДА ПРИ СТАРТЕ -->
+    <div id="promo-overlay">
+        <div class="welcome-box" style="width: 100%; max-width: 320px; margin-top: 0;">
+            <h2 style="margin-top:0; color:#007AFF !important;">Добро пожаловать! ✨</h2>
+            <p style="font-size: 14px; line-height: 1.4; color: #666 !important;">Введите секретный промокод вашего пригласителя, чтобы войти в приложение и забрать 30 коинов.</p>
+            <input type="text" id="promo-input" placeholder="Введите промокод..." style="text-align:center;">
+            <button class="btn" style="width:100%; margin-top:15px; background:#007AFF !important; color:white !important;" onclick="checkPromoCode()">Активировать</button>
+            <button class="btn" style="width:100%; margin-top:10px; background:#E5E5EA !important; color:#666 !important; font-size:13px;" onclick="skipPromoCode()">У меня нет промокода ➡️</button>
         </div>
     </div>
 
@@ -13,49 +156,46 @@
 
     <!-- 1. ЗАДАНИЯ -->
     <div id="tasks-page" class="content active">
-        <!-- ТВОЙ ТЕКСТ ПО ЦЕНТРУ -->
         <div class="welcome-box" style="margin-bottom: 25px;">
-            <h2 style="margin-top:0; color:#007AFF;">Привет! ✨</h2>
+            <h2 style="margin-top:0; color:#007AFF !important;">Привет! ✨</h2>
             <p style="font-size: 16px; line-height: 1.5; margin: 0;">Я очень рада, что ты посетил мой мини-аппс. Вот тебе приветственный бонус <b>30 коинов</b>.</p>
         </div>
 
-        <h3 style="margin-left: 5px;">🔥 Доступные задания:</h3>
-        
-        <!-- Сюда скрипт автоматически нарисует СТО карточек заданий -->
+        <h3 style="margin-left: 5px; color: var(--text-color) !important;">🔥 Доступные задания:</h3>
         <div id="cards-container"></div>
-                <p style="text-align:center; color:#8E8E93; font-size:13px; margin-top:20px;">Задания обновляются каждый день автоматически! ✨</p>
+                <p style="text-align:center; color:#8E8E93 !important; font-size:13px; margin-top:20px;">Задания обновляются каждый день автоматически! ✨</p>
     </div>
 
     <!-- 2. СТАТИСТИКА -->
     <div id="stats-page" class="content">
-        <h2>📊 Твоя Статистика</h2>
+        <h2 style="color: var(--text-color) !important;">📊 Твоя Статистика</h2>
         
-        <h3>✅ Все выполненные задания</h3>
+        <h3 style="color: var(--text-color) !important;">✅ Все выполненные задания</h3>
         <div class="stats-table">
-            <div class="stats-row"><span>Всего заработано:</span><b style="color:#007AFF;"><span id="stat-done-coins">0</span> U-COINS</b></div>
+            <div class="stats-row"><span>Всего заработано:</span><b style="color:#007AFF !important;"><span id="stat-done-coins">0</span> U-COINS</b></div>
             <div class="stats-row"><span>Завершено задач:</span><b id="stat-done-count">0 шт.</b></div>
         </div>
 
-        <h3>⏳ Задания в проверке / Выполняются</h3>
+        <h3 style="color: var(--text-color) !important;">⏳ Задания в проверке / Выполняются</h3>
         <div class="stats-table" style="border-left: 4px solid #FFCC00;">
-            <div class="stats-row"><span>Ожидают проверки:</span><b style="color:#FFCC00;"><span id="stat-check-count">0</span> задач</b></div>
-            <div class="stats-row"><span>Вы пришли от админа:</span><b id="source-val" style="color:#007AFF;">Не указан</b></div>
+            <div class="stats-row"><span>Ожидают проверки:</span><b style="color:#FFCC00 !important;"><span id="stat-check-count">0</span> задач</b></div>
+            <div class="stats-row"><span>Вы пришли от админа:</span><b id="source-val" style="color:#007AFF !important;">Не указан</b></div>
         </div>
     </div>
 
     <!-- 3. ПОДДЕРЖКА -->
     <div id="support-page" class="content">
-        <h2>🆘 Поддержка</h2>
-        <div class="welcome-box" style="border-color: var(--accent-blue);">
+        <h2 style="color: var(--text-color) !important;">🆘 Поддержка</h2>
+        <div class="welcome-box" style="border-color: var(--accent-blue) !important;">
             <p style="font-size:15px; margin: 0;">Если у вас есть какие-то вопросы или вы хотели бы нам что-то предложить, пишите нашему менеджеру:</p>
-            <a href="https://t.me" target="_blank" class="btn" style="display:block; margin-top:15px; text-decoration:none; background:#007AFF; color:white;">Написать в поддержку</a>
+            <a href="https://t.me" target="_blank" class="btn" style="display:block; margin-top:15px; text-decoration:none; background:#007AFF !important; color:white !important;">Написать в поддержку</a>
         </div>
     </div>
 
     <!-- 4. ВЫВОД -->
     <div id="withdraw-page" class="content">
-        <h2>💸 Вывод средств</h2>
-        <p style="font-size:13px; color:#8E8E93; margin-bottom:15px;">Минимум на телефон — 100 ₽. На карту банка — 150 ₽.</p>
+        <h2 style="color: var(--text-color) !important;">💸 Вывод средств</h2>
+        <p style="font-size:13px; color:#8E8E93 !important; margin-bottom:15px;">Минимум на телефон — 100 ₽. На карту банка — 150 ₽.</p>
         
         <label>Коснитесь, поскольку вы вывести хотите:</label>
         <input type="number" id="withdraw-amount" placeholder="Введите сумму U-COINS">
@@ -69,125 +209,7 @@
         </select>
 
         <input type="text" id="withdraw-wallet" placeholder="Номер карты или телефона для СБП" style="margin-top:15px;">
-        <button class="btn" style="width:100%; margin-top:20px; background: #007AFF; color: white;" onclick="sendWithdraw()">Коснитесь, чтобы вывести</button>
-    </div>
-
-    <!-- НИЖНИЕ 4 КНОПКИ -->
-    <div class="tab-bar">
-        <div class="tab-item active" onclick="switchTab('tasks-page', this)">
-            <span class="tab-icon">📋</span><span>Задания</span>
-        </div>
-        <div class="tab-item" onclick="switchTab('stats-page', this)">
-            <span class="tab-icon">📊</span><span>Статистика</span>
-        </div>
-        <div class="tab-item" onclick="switchTab('support-page', this)">
-            <span class="tab-icon">🆘</span><span>Поддержка</span>
-        </div>
-        <div class="tab-item" onclick="switchTab('withdraw-page', this)">
-            <span class="tab-icon">💸</span><span>Вывод</span>
-        </div>
-    </div>
-
-    <script>
-        let balance = parseInt(localStorage.getItem('user_balance')) || 0;
-        let completedTasks = parseInt(localStorage.getItem('completed_tasks')) || 0;
-        let pendingTasks = parseInt(localStorage.getItem('pending_tasks')) || 0;
-        let userSource = localStorage.getItem('user_source') || '';
-        let hasEntered = localStorage.getItem('has_entered') || 'false';
-
-        // Твои 4 промокода для админов
-        const validPromos = ['косметичка', 'птичка', 'ириска', 'малинка'];
-
-        // ПОЛНОСТЬЮ ПРОВЕРЕННЫЙ ИСПРАВЛЕННЫЙ ГЕНЕРАТОР НА 100 КАРТОЧЕК
-        function generate100Cards() {
-            const container = document.getElementById('cards-container');
-            if(!container) return;
-            container.innerHTML = '';
-            
-            const rewardsList =; 
-            
-            for (let i = 1; i <= 100; i++) {
-                let reward = rewardsList[i % rewardsList.length];
-                container.innerHTML += `
-                    <div class="task-card">
-                        <div>
-                            <b style="font-size:15px; display:block;">Быстрое задание #${i}</b>
-                            <span style="font-size:13px; color:#8E8E93;">Награда: +${reward} U-COINS</span>
-                        </div>
-                        <a href="https://omg10.com" target="_blank" class="btn" onclick="completeTaskSimulate(${reward})">Выполнить</a>
-                    </div>
-                `;
-            }
-        }
-
-        if (hasEntered === 'true') {
-            document.getElementById('promo-overlay').style.display = 'none';
-            updateUI();
-        }
-        
-        generate100Cards();
-
-        function checkPromoCode() {
-            let input = document.getElementById('promo-input').value.trim().toLowerCase();
-            
-            if (validPromos.includes(input)) {
-                balance = 30; // Начисляем приветственный бонус
-                userSource = input;
-                hasEntered = 'true';
-                
-                localStorage.setItem('user_balance', balance);
-                localStorage.setItem('user_source', userSource);
-                localStorage.setItem('has_entered', hasEntered);
-                
-                document.getElementById('promo-overlay').style.display = 'none';
-                updateUI();
-                        <p style="text-align:center; color:#8E8E93; font-size:13px; margin-top:20px;">Задания обновляются каждый день автоматически! ✨</p>
-    </div>
-
-    <!-- 2. СТАТИСТИКА -->
-    <div id="stats-page" class="content">
-        <h2>📊 Твоя Статистика</h2>
-        
-        <h3>✅ Все выполненные задания</h3>
-        <div class="stats-table">
-            <div class="stats-row"><span>Всего заработано:</span><b style="color:#007AFF;"><span id="stat-done-coins">0</span> U-COINS</b></div>
-            <div class="stats-row"><span>Завершено задач:</span><b id="stat-done-count">0 шт.</b></div>
-        </div>
-
-        <h3>⏳ Задания в проверке / Выполняются</h3>
-        <div class="stats-table" style="border-left: 4px solid #FFCC00;">
-            <div class="stats-row"><span>Ожидают проверки:</span><b style="color:#FFCC00;"><span id="stat-check-count">0</span> задач</b></div>
-            <div class="stats-row"><span>Вы пришли от админа:</span><b id="source-val" style="color:#007AFF;">Не указан</b></div>
-        </div>
-    </div>
-
-    <!-- 3. ПОДДЕРЖКА -->
-    <div id="support-page" class="content">
-        <h2>🆘 Поддержка</h2>
-        <div class="welcome-box" style="border-color: var(--accent-blue);">
-            <p style="font-size:15px; margin: 0;">Если у вас есть какие-то вопросы или вы хотели бы нам что-то предложить, пишите нашему менеджеру:</p>
-            <a href="https://t.me" target="_blank" class="btn" style="display:block; margin-top:15px; text-decoration:none; background:#007AFF; color:white;">Написать в поддержку</a>
-        </div>
-    </div>
-
-    <!-- 4. ВЫВОД -->
-    <div id="withdraw-page" class="content">
-        <h2>💸 Вывод средств</h2>
-        <p style="font-size:13px; color:#8E8E93; margin-bottom:15px;">Минимум на телефон — 100 ₽. На карту банка — 150 ₽.</p>
-        
-        <label>Коснитесь, поскольку вы вывести хотите:</label>
-        <input type="number" id="withdraw-amount" placeholder="Введите сумму U-COINS">
-        
-        <label style="margin-top:15px; display:block;">Выберите банк (прокрутите колёсико):</label>
-        <select id="withdraw-method">
-            <option value="sbp">📲 СБП (По номеру телефона)</option>
-            <option value="sber">🟢 Сбербанк</option>
-            <option value="tinkoff">🟡 Т-Банк (Тинькофф)</option>
-            <option value="alpha">🔴 Альфа-Банк</option>
-        </select>
-
-        <input type="text" id="withdraw-wallet" placeholder="Номер карты или телефона для СБП" style="margin-top:15px;">
-        <button class="btn" style="width:100%; margin-top:20px; background: #007AFF; color: white;" onclick="sendWithdraw()">Коснитесь, чтобы вывести</button>
+        <button class="btn" style="width:100%; margin-top:20px; background: #007AFF !important; color: white !important;" onclick="sendWithdraw()">Коснитесь, чтобы вывести</button>
     </div>
 
     <!-- НИЖНИЕ 4 КНОПКИ -->
@@ -225,8 +247,8 @@
                 container.innerHTML += `
                     <div class="task-card">
                         <div>
-                            <b style="font-size:15px; display:block;">Быстрое задание #${i}</b>
-                            <span style="font-size:13px; color:#8E8E93;">Награда: +${reward} U-COINS</span>
+                            <b style="font-size:15px; display:block; color:#2C3E50 !important;">Быстрое задание #${i}</b>
+                            <span style="font-size:13px; color:#8E8E93 !important;">Награда: +${reward} U-COINS</span>
                         </div>
                         <a href="https://omg10.com" target="_blank" class="btn" onclick="completeTaskSimulate(${reward})">Выполнить</a>
                     </div>
@@ -250,7 +272,6 @@
             }
         }
 
-        // Функция пропуска кода
         function skipPromoCode() {
             enterApp('Самостоятельно');
         }
