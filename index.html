@@ -2,66 +2,108 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YANISY Mini App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>YANISY</title>
     <style>
-        /* Базовые стили и цвета */
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
-        body {
-            background-color: #0A0A0A;
-            color: #FFFFFF;
-            padding: 20px;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+        :root {
+            --bg-color: #0A0A0A;
+            --text-color: #FFFFFF;
+            --accent-pink: #FF007F;
+            --card-color: #1A1A1A;
+            --border-color: #333333;
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; }
         
-        /* Баланс в левом верхнем углу */
-        #balance-badge {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            background-color: #1A1A1A;
-            padding: 10px 16px;
-            border-radius: 20px;
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-bottom: 80px;
+            min-height: 100vh;
+        }
+
+        /* Баланс сверху */
+        #balance-bar {
+            position: sticky;
+            top: 0;
+            background: var(--bg-color);
+            padding: 15px 20px;
+            font-size: 18px;
             font-weight: bold;
-            color: #FF007F;
-            border: 1px solid #333;
-            z-index: 100;
-            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 10;
+        }
+        #balance-bar span { color: var(--accent-pink); }
+
+        /* Карточки и кнопки */
+        .section-title {
+            padding: 15px 20px 5px;
+            font-size: 16px;
+            color: #CCC;
         }
 
-        h1 {
-            color: #FF007F;
-            text-align: center;
-            font-size: 24px;
-            margin-top: 30px;
-            margin-bottom: 20px;
+        .platform-card {
+            background: var(--card-color);
+            margin: 10px 20px;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
+        .platform-card .info h4 { font-size: 16px; margin-bottom: 4px; }
+        .platform-card .info p { font-size: 13px; color: #888; }
 
-        .btn {
+        .main-btn {
             display: block;
-            width: 100%;
-            max-width: 340px;
-            margin: 12px auto;
-            padding: 16px;
+            width: calc(100% - 40px);
+            margin: 10px auto;
+            padding: 14px;
             border-radius: 12px;
             border: none;
+            background: var(--accent-pink);
+            color: #fff;
             font-size: 16px;
             font-weight: bold;
             text-align: center;
-            text-decoration: none;
-            color: #FFFFFF;
-            background-color: #2A2A2A;
             cursor: pointer;
-            transition: 0.2s;
         }
-        .btn-pink { background-color: #FF007F; }
-        .btn:hover { opacity: 0.8; }
 
-        /* Вкладки (статистика, вывод, рефералы) */
-        .tab-content { display: none; margin-top: 10px; }
-        .tab-content.active { display: block; }
+        /* Нижняя панель */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--bg-color);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0 20px;
+            z-index: 100;
+        }
+        .nav-item {
+            background: none;
+            border: none;
+            color: #666;
+            font-size: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            padding: 0 10px;
+        }
+        .nav-item.active { color: var(--accent-pink); font-weight: bold; }
+        .nav-item svg { width: 24px; height: 24px; fill: currentColor; }
+
+        /* Страницы */
+        .page { display: none; padding: 0 20px; padding-bottom: 20px; }
+        .page.active { display: block; }
 
         /* Форма вывода */
         .form-group { margin-bottom: 15px; }
@@ -70,181 +112,303 @@
             width: 100%;
             padding: 12px;
             border-radius: 8px;
-            border: 1px solid #444;
-            background-color: #1A1A1A;
-            color: #FFF;
+            border: 1px solid var(--border-color);
+            background: var(--card-color);
+            color: #fff;
             font-size: 16px;
         }
         .form-group select { appearance: auto; }
 
-        /* Статистика */
-        .stat-card {
-            background-color: #1A1A1A;
+        /* Задания */
+        .task-item {
+            background: var(--card-color);
             padding: 15px;
             border-radius: 12px;
             margin-bottom: 10px;
-            border-left: 4px solid #FF007F;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--border-color);
         }
-        .stat-card span { color: #FF007F; font-weight: bold; }
+        .task-item button {
+            background: var(--accent-pink);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        /* Админ-панель (видна только тебе по юзернейму @HEDYPA) */
+        #admin-panel {
+            display: none;
+            background: var(--card-color);
+            border: 2px solid var(--accent-pink);
+            padding: 15px;
+            border-radius: 12px;
+            margin: 20px;
+        }
+        #admin-panel h3 { color: var(--accent-pink); margin-bottom: 10px; }
+        .admin-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
 
-    <!-- БАЛАНС (Левый верхний угол, обновляется автоматически) -->
-    <div id="balance-badge">🪙 <span id="user-balance">0</span> Y-Coins</div>
+    <!-- БАЛАНС СВЕРХУ -->
+    <div id="balance-bar">
+        <span>🪙 0 Y-Coins</span>
+        <span id="user-balance" style="font-weight:normal;"></span>
+    </div>
 
-    <h1>YANISY</h1>
+    <!-- ЗАДАНИЯ (ГЛАВНАЯ СТРАНИЦА) -->
+    <div id="page-tasks" class="page active">
+        <div class="section-title">🧱 Большие витрины:</div>
+        
+        <div class="platform-card">
+            <div class="info">
+                <h4>Платформа TADS</h4>
+                <p>Подписки на каналы и быстрый запуск ботов</p>
+            </div>
+        </div>
 
-    <!-- ГЛАВНЫЕ КНОПКИ -->
-    <button class="btn btn-pink" onclick="openOfferWall()">📋 Открыть задания</button>
-    
-    <button class="btn" onclick="switchTab('stats')">📊 Статистика</button>
-    <button class="btn" onclick="switchTab('withdraw')">💸 Вывод</button>
-    <button class="btn" onclick="switchTab('referrals')">👥 Рефералы</button>
-    <button class="btn" onclick="window.open('https://t.me/YANISY_bot', '_blank')">🆘 Поддержка</button>
+        <div class="platform-card">
+            <div class="info">
+                <h4>Платформа NOTIK</h4>
+                <p>Скачивание приложений и mini-тесты</p>
+            </div>
+        </div>
+
+        <div class="platform-card">
+            <div class="info">
+                <h4>Платформа KIWIWALL</h4>
+                <p>Простые клики, серфинг и лайки</p>
+            </div>
+        </div>
+
+        <div class="section-title">🔥 Доступные задания:</div>
+        <p style="color:#888; font-size:14px; padding:0 20px 10px;">Задания обновляются каждый день автоматически!</p>
+
+        <div class="task-item">
+            <div>
+                <b>Быстрое задание #1</b>
+                <div style="font-size:13px; color:#888;">Награда: +10 Y-Coins</div>
+            </div>
+            <button onclick="openOfferWall()">Выполнить</button>
+        </div>
+    </div>
 
     <!-- СТАТИСТИКА -->
-    <div id="stats" class="tab-content active">
-        <div class="stat-card">✅ Выполнено заданий: <span id="tasks-done">0</span></div>
-        <div class="stat-card">⏳ На проверке: <span id="tasks-pending">0</span></div>
-        <div class="stat-card">📊 Всего заработано: <span id="total-earned">0</span> Y-Coins</div>
+    <div id="page-stats" class="page">
+        <div class="section-title">📊 Твоя статистика</div>
+        <div class="platform-card">
+            <div class="info">
+                <h4>✅ Выполнено: <span id="stat-done">0</span></h4>
+                <p>Заданий завершено</p>
+            </div>
+        </div>
+        <div class="platform-card">
+            <div class="info">
+                <h4>⏳ На проверке: <span id="stat-pending">0</span></h4>
+                <p>Ожидают подтверждения</p>
+            </div>
+        </div>
+        <div class="platform-card">
+            <div class="info">
+                <h4>💰 Баланс: <span id="stat-balance">0</span> Y-Coins</h4>
+            </div>
+        </div>
+    </div>
+
+    <!-- ПОДДЕРЖКА -->
+    <div id="page-support" class="page">
+        <div class="section-title">🆘 Поддержка</div>
+        <div class="platform-card" style="flex-direction:column; align-items:flex-start;">
+            <p>Если у тебя возникли вопросы, пиши создателю:</p>
+            <button class="main-btn" onclick="window.open('https://t.me/HEDYPA', '_blank')">Написать в Telegram</button>
+        </div>
     </div>
 
     <!-- ВЫВОД -->
-    <div id="withdraw" class="tab-content">
+    <div id="page-withdraw" class="page">
+        <div class="section-title">💸 Вывод средств</div>
+        
         <div class="form-group">
-            <label>Сумма вывода (мин. 100 Y-Coins)</label>
-            <input type="number" id="withdraw-amount" placeholder="Например: 150">
+            <label>Сколько Y-Coins вывести?</label>
+            <input type="number" id="w-amount" placeholder="Например: 150">
         </div>
         <div class="form-group">
-            <label>Способ вывода</label>
-            <select id="withdraw-method">
+            <label>Куда вывести?</label>
+            <select id="w-method">
                 <option value="">Выберите способ</option>
                 <option value="sbp">СБП (по номеру телефона)</option>
                 <option value="tinkoff">Тинькофф</option>
-                <option value="card">Карта (любой банк)</option>
+                <option value="card">Карта любого банка</option>
             </select>
         </div>
         <div class="form-group">
-            <label>Реквизиты (номер карты или телефона)</label>
-            <input type="text" id="withdraw-details" placeholder="Номер карты или телефона">
-        </div>
-        <button class="btn btn-pink" onclick="sendWithdraw()">📤 Отправить заявку</button>
-    </div>
-
-    <!-- РЕФЕРАЛЫ -->
-    <div id="referrals" class="tab-content">
-        <div class="form-group">
-            <label>Кто тебя привёл? (выбери из списка)</label>
-            <select id="referral-select">
-                <option value="">— Выберите реферала —</option>
+            <label>Кто тебя привёл? (выбери реферала)</label>
+            <select id="w-ref">
+                <option value="">— Выберите —</option>
                 <option value="ref1">Реферал №1</option>
                 <option value="ref2">Реферал №2</option>
                 <option value="ref3">Реферал №3</option>
                 <option value="ref4">Реферал №4</option>
                 <option value="ref5">Реферал №5</option>
-                <option value="ref6">Реферал №6</option>
-                <option value="other">Другой (напишу сам)</option>
+                <option value="other">Другой</option>
             </select>
         </div>
+        <div class="form-group">
+            <label>Твой Telegram (юзернейм)</label>
+            <input type="text" id="w-user" placeholder="@username">
+        </div>
+        <button class="main-btn" onclick="submitWithdraw()">📤 Подать заявку</button>
+    </div>
+
+    <!-- АДМИН-ПАНЕЛЬ (Открывается только у Яны с юзернеймом @HEDYPA) -->
+    <div id="admin-panel">
+        <h3>🔐 Админ-панель</h3>
+        <p style="font-size:13px; color:#888;">Только для создателя.</p>
+        <div id="admin-list"></div>
+    </div>
+
+    <!-- НИЖНЯЯ ПАНЕЛЬ -->
+    <div class="bottom-nav">
+        <button class="nav-item active" onclick="switchPage('page-tasks', this)">
+            <svg viewBox="0 0 24 24"><path d="M4 6h16v2H4V6zm0 5h16v2H4v-2zm0 5h10v2H4v-2z"/></svg>
+            Задания
+        </button>
+        <button class="nav-item" onclick="switchPage('page-stats', this)">
+            <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+            Статистика
+        </button>
+        <button class="nav-item" onclick="switchPage('page-support', this)">
+            <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+            Поддержка
+        </button>
+        <button class="nav-item" onclick="switchPage('page-withdraw', this)">
+            <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+            Вывод
+        </button>
     </div>
 
     <script>
-        // ==================== ЛОГИКА БАЛАНСА И СТАТИСТИКИ ====================
-        let balance = parseInt(localStorage.getItem('user_balance')) || 0;
-        let tasksDone = parseInt(localStorage.getItem('tasks_done')) || 0;
-        let tasksPending = parseInt(localStorage.getItem('tasks_pending')) || 0;
-
-        function updateUI() {
-            document.getElementById('user-balance').innerText = balance;
-            document.getElementById('tasks-done').innerText = tasksDone;
-            document.getElementById('tasks-pending').innerText = tasksPending;
-            document.getElementById('total-earned').innerText = balance;
-        }
-        updateUI();
-
-        // ==================== ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК ====================
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-        }
-
-        // ==================== ВЫВОД (ОТПРАВКА ЗАЯВКИ) ====================
-        function sendWithdraw() {
-            const amount = parseInt(document.getElementById('withdraw-amount').value);
-            const method = document.getElementById('withdraw-method').value;
-            const details = document.getElementById('withdraw-details').value.trim();
-
-            if (!amount || amount < 100) return alert('❌ Минимальная сумма вывода: 100 Y-Coins');
-            if (!method) return alert('❌ Выбери способ вывода');
-            if (!details) return alert('❌ Введи реквизиты (карту или телефон)');
-            if (amount > balance) return alert('❌ Недостаточно Y-Coins на балансе');
-
-            // Отправка заявки (здесь можно добавить отправку в бота)
-            const requestData = {
-                type: 'withdraw',
-                amount: amount,
-                method: method,
-                details: details,
-                user: tgUserId
-            };
-            console.log('📤 Заявка на вывод:', requestData);
-
-            // Списываем баланс и показываем уведомление
-            balance -= amount;
-            localStorage.setItem('user_balance', balance);
-            updateUI();
-            alert('✅ Заявка отправлена! Ожидай ответа создателя.');
-        }
-
-        // ==================== ПОДКЛЮЧЕНИЕ GIGAPUB SDK ====================
-        const PROJECT_ID = "7301"; // ЗАМЕНИ НА СВОЙ ID
-
-        function openOfferWall() {
-            if (window.gigaOfferWallSDK) {
-                window.gigaOfferWallSDK.open();
-            } else {
-                window.loadOfferWallSDK({ projectId: PROJECT_ID })
-                    .then(sdk => {
-                        window.gigaOfferWallSDK = sdk;
-                        sdk.open();
-                    })
-                    .catch(err => {
-                        console.error("Ошибка загрузки SDK:", err);
-                        alert("Не удалось загрузить задания. Проверь PROJECT_ID.");
-                    });
+        // ===== ИНТЕГРАЦИЯ GIGAPUB (КОД, КОТОРЫЙ ТЫ СКОПИРОВАЛА) =====
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!window.loadOfferWallSDK) {
+                const script = document.createElement('script');
+                script.src = 'https://wall.giga.pub/api/v1/loader.js?projectId=7301';
+                script.async = true;
+                document.head.appendChild(script);
             }
-        }
+        });
 
-        // Начисление награды
-        window.loadGigaSDKCallbacks = window.loadGigaSDKCallbacks || [];
-        window.loadGigaSDKCallbacks.push(() => {
-            window.loadOfferWallSDK({ projectId: PROJECT_ID })
-                .then(sdk => {
-                    window.gigaOfferWallSDK = sdk;
-                    sdk.on('rewardClaim', async (data) => {
+        // ===== ФУНКЦИЯ ОТКРЫТИЯ ЗАДАНИЙ =====
+        function openOfferWall() {
+            if (window.loadOfferWallSDK) {
+                window.loadOfferWallSDK({
+                    projectId: 7301,
+                    onReward: function(data) {
                         let earned = parseInt(data.amount) || 10;
                         balance += earned;
-                        tasksDone += 1;
+                        done += 1;
                         localStorage.setItem('user_balance', balance);
-                        localStorage.setItem('tasks_done', tasksDone);
+                        localStorage.setItem('tasks_done', done);
                         updateUI();
                         if (window.Telegram && window.Telegram.WebApp) {
                             window.Telegram.WebApp.showAlert('✅ +' + earned + ' Y-Coins!');
                         }
-                        sdk.confirmReward(data.rewardId, data.hash);
-                    });
-                })
-                .catch(err => console.error("Ошибка инициализации GigaPub:", err));
-        });
-
-        // ==================== ДАННЫЕ ПОЛЬЗОВАТЕЛЯ ====================
-        let tgUserId = "test_user";
-        if (window.Telegram && window.Telegram.WebApp) {
-            window.Telegram.WebApp.ready();
-            window.Telegram.WebApp.expand();
-            tgUserId = window.Telegram.WebApp.initDataUnsafe.user?.id || "test_user";
+                    }
+                });
+            } else {
+                alert("SDK ещё загружается, подожди немного...");
+            }
         }
+
+        // ===== ЛОГИКА БАЛАНСА =====
+        let balance = parseInt(localStorage.getItem('user_balance')) || 0;
+        let done = parseInt(localStorage.getItem('tasks_done')) || 0;
+        let pending = parseInt(localStorage.getItem('tasks_pending')) || 0;
+
+        function updateUI() {
+            document.getElementById('user-balance').innerText = balance + ' Y-Coins';
+            document.getElementById('stat-balance').innerText = balance;
+            document.getElementById('stat-done').innerText = done;
+            document.getElementById('stat-pending').innerText = pending;
+        }
+        updateUI();
+
+        // ===== ПЕРЕКЛЮЧЕНИЕ СТРАНИЦ =====
+        function switchPage(pageId, btn) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        // ===== ЗАЯВКА НА ВЫВОД =====
+        let withdrawRequests = JSON.parse(localStorage.getItem('withdraw_requests')) || [];
+
+        function submitWithdraw() {
+            let amount = parseInt(document.getElementById('w-amount').value);
+            let method = document.getElementById('w-method').value;
+            let ref = document.getElementById('w-ref').value;
+            let user = document.getElementById('w-user').value.trim();
+
+            if (!amount || amount < 100) return alert('❌ Минимум: 100 Y-Coins');
+            if (!method) return alert('❌ Выбери способ вывода');
+            if (amount > balance) return alert('❌ Недостаточно Y-Coins');
+
+            let req = { amount, method, ref, user, time: new Date().toLocaleString() };
+            withdrawRequests.push(req);
+            localStorage.setItem('withdraw_requests', JSON.stringify(withdrawRequests));
+
+            balance -= amount;
+            localStorage.setItem('user_balance', balance);
+            updateUI();
+
+            alert('✅ Заявка отправлена! Ожидай ответа.');
+            // Очистить поля
+            document.getElementById('w-amount').value = '';
+            document.getElementById('w-user').value = '';
+            document.getElementById('w-method').value = '';
+            document.getElementById('w-ref').value = '';
+            showAdminPanel(); // обновить админку
+        }
+
+        // ===== АДМИН-ПАНЕЛЬ (видна только тебе @HEDYPA) =====
+        function showAdminPanel() {
+            let tgUser = "test_user";
+            let tgUsername = "";
+            
+            if (window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.ready();
+                window.Telegram.WebApp.expand();
+                const user = window.Telegram.WebApp.initDataUnsafe.user;
+                if (user) {
+                    tgUser = user.id || "test_user";
+                    tgUsername = user.username || "";
+                }
+            }
+
+            if (tgUsername.toLowerCase() === "hedypa") {
+                document.getElementById('admin-panel').style.display = 'block';
+                let list = document.getElementById('admin-list');
+                list.innerHTML = '';
+                withdrawRequests.forEach((r, i) => {
+                    list.innerHTML += `<div class="admin-row">
+                        <span>${r.user} | ${r.amount} Y-Coins | ${r.method}</span>
+                        <span style="color:#888;">${r.time}</span>
+                    </div>`;
+                });
+            }
+        }
+        showAdminPanel();
     </script>
 </body>
 </html>
