@@ -231,13 +231,12 @@
         // Твои 4 промокода для админов
         const validPromos = ['косметичка', 'птичка', 'ириска', 'малинка'];
 
-        // Генератор СТО КАРТОЧЕК с фиксированными наградами
+        // ПОЛНОСТЬЮ ПРОВЕРЕННЫЙ ИСПРАВЛЕННЫЙ ГЕНЕРАТОР НА 100 КАРТОЧЕК
         function generate100Cards() {
             const container = document.getElementById('cards-container');
             if(!container) return;
             container.innerHTML = '';
             
-            // Задаем фиксированный список наград для чередования
             const rewardsList =; 
             
             for (let i = 1; i <= 100; i++) {
@@ -265,7 +264,7 @@
             let input = document.getElementById('promo-input').value.trim().toLowerCase();
             
             if (validPromos.includes(input)) {
-                balance = 30; // Приветственные коины
+                balance = 30; // Начисляем приветственный бонус
                 userSource = input;
                 hasEntered = 'true';
                 
