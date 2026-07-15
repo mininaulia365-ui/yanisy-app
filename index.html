@@ -37,40 +37,10 @@
             z-index: 10;
         }
         #balance-bar span { color: var(--accent-pink); }
-
-        /* Карточки и кнопки */
-        .section-title {
-            padding: 15px 20px 5px;
-            font-size: 16px;
-            color: #CCC;
-        }
-
-        .platform-card {
-            background: var(--card-color);
-            margin: 10px 20px;
-            padding: 15px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
+        #balance-bar .balance-left, #balance-bar .balance-right {
             display: flex;
             align-items: center;
-            gap: 15px;
-        }
-        .platform-card .info h4 { font-size: 16px; margin-bottom: 4px; }
-        .platform-card .info p { font-size: 13px; color: #888; }
-
-        .main-btn {
-            display: block;
-            width: calc(100% - 40px);
-            margin: 10px auto;
-            padding: 14px;
-            border-radius: 12px;
-            border: none;
-            background: var(--accent-pink);
-            color: #fff;
-            font-size: 16px;
-            font-weight: bold;
-            text-align: center;
-            cursor: pointer;
+            gap: 5px;
         }
 
         /* Нижняя панель */
@@ -102,7 +72,7 @@
         .nav-item svg { width: 24px; height: 24px; fill: currentColor; }
 
         /* Страницы */
-        .page { display: none; padding: 0 20px; padding-bottom: 20px; }
+        .page { display: none; padding: 20px; padding-bottom: 20px; }
         .page.active { display: block; }
 
         /* Форма вывода */
@@ -119,17 +89,25 @@
         }
         .form-group select { appearance: auto; }
 
-        /* Задания */
+        /* Сетка заданий */
+        #tasks-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
         .task-item {
             background: var(--card-color);
             padding: 15px;
             border-radius: 12px;
-            margin-bottom: 10px;
+            border: 1px solid var(--border-color);
             display: flex;
+            flex-direction: column;
             justify-content: space-between;
             align-items: center;
-            border: 1px solid var(--border-color);
+            text-align: center;
         }
+        .task-item .title { font-size: 14px; font-weight: bold; margin-bottom: 5px; }
+        .task-item .reward { font-size: 12px; color: #888; margin-bottom: 10px; }
         .task-item button {
             background: var(--accent-pink);
             border: none;
@@ -137,16 +115,18 @@
             border-radius: 6px;
             color: #fff;
             cursor: pointer;
+            width: 100%;
+            font-size: 14px;
         }
 
-        /* Админ-панель (видна только тебе по юзернейму @HEDYPA) */
+        /* Админ-панель */
         #admin-panel {
             display: none;
             background: var(--card-color);
             border: 2px solid var(--accent-pink);
             padding: 15px;
             border-radius: 12px;
-            margin: 20px;
+            margin-top: 20px;
         }
         #admin-panel h3 { color: var(--accent-pink); margin-bottom: 10px; }
         .admin-row {
@@ -162,82 +142,51 @@
 
     <!-- БАЛАНС СВЕРХУ -->
     <div id="balance-bar">
-        <span>🪙 0 Y-Coins</span>
-        <span id="user-balance" style="font-weight:normal;"></span>
+        <div class="balance-left">🪙 <span id="user-balance">0</span> Y-Coins</div>
+        <div class="balance-right"><span id="stat-balance-top" style="font-weight:normal;">0</span> Y-Coins</div>
     </div>
 
-    <!-- ЗАДАНИЯ (ГЛАВНАЯ СТРАНИЦА) -->
+    <!-- ЗАДАНИЯ (ГЛАВНАЯ) -->
     <div id="page-tasks" class="page active">
-        <div class="section-title">🧱 Большие витрины:</div>
-        
-        <div class="platform-card">
-            <div class="info">
-                <h4>Платформа TADS</h4>
-                <p>Подписки на каналы и быстрый запуск ботов</p>
-            </div>
-        </div>
-
-        <div class="platform-card">
-            <div class="info">
-                <h4>Платформа NOTIK</h4>
-                <p>Скачивание приложений и mini-тесты</p>
-            </div>
-        </div>
-
-        <div class="platform-card">
-            <div class="info">
-                <h4>Платформа KIWIWALL</h4>
-                <p>Простые клики, серфинг и лайки</p>
-            </div>
-        </div>
-
-        <div class="section-title">🔥 Доступные задания:</div>
-        <p style="color:#888; font-size:14px; padding:0 20px 10px;">Задания обновляются каждый день автоматически!</p>
-
-        <div class="task-item">
-            <div>
-                <b>Быстрое задание #1</b>
-                <div style="font-size:13px; color:#888;">Награда: +10 Y-Coins</div>
-            </div>
-            <button onclick="openOfferWall()">Выполнить</button>
-        </div>
+        <h4 style="margin-bottom:15px;">🔥 Доступные задания:</h4>
+        <div id="tasks-grid"></div>
     </div>
 
     <!-- СТАТИСТИКА -->
     <div id="page-stats" class="page">
-        <div class="section-title">📊 Твоя статистика</div>
-        <div class="platform-card">
-            <div class="info">
-                <h4>✅ Выполнено: <span id="stat-done">0</span></h4>
-                <p>Заданий завершено</p>
+        <h4>📊 Твоя статистика</h4>
+        <div style="background:var(--card-color); border-radius:12px; border:1px solid var(--border-color); padding:15px; margin-bottom:10px;">
+            <div style="display:flex; justify-content:space-between;">
+                <span>✅ Выполнено:</span>
+                <span id="stat-done">0</span>
             </div>
         </div>
-        <div class="platform-card">
-            <div class="info">
-                <h4>⏳ На проверке: <span id="stat-pending">0</span></h4>
-                <p>Ожидают подтверждения</p>
+        <div style="background:var(--card-color); border-radius:12px; border:1px solid var(--border-color); padding:15px; margin-bottom:10px;">
+            <div style="display:flex; justify-content:space-between;">
+                <span>⏳ На проверке:</span>
+                <span id="stat-pending">0</span>
             </div>
         </div>
-        <div class="platform-card">
-            <div class="info">
-                <h4>💰 Баланс: <span id="stat-balance">0</span> Y-Coins</h4>
+        <div style="background:var(--card-color); border-radius:12px; border:1px solid var(--border-color); padding:15px; margin-bottom:10px;">
+            <div style="display:flex; justify-content:space-between;">
+                <span>💰 Баланс:</span>
+                <span id="stat-balance" style="color:var(--accent-pink);">0</span>
             </div>
         </div>
     </div>
 
     <!-- ПОДДЕРЖКА -->
     <div id="page-support" class="page">
-        <div class="section-title">🆘 Поддержка</div>
-        <div class="platform-card" style="flex-direction:column; align-items:flex-start;">
-            <p>Если у тебя возникли вопросы, пиши создателю:</p>
-            <button class="main-btn" onclick="window.open('https://t.me/HEDYPA', '_blank')">Написать в Telegram</button>
+        <h4>🆘 Поддержка</h4>
+        <div style="background:var(--card-color); border-radius:12px; border:1px solid var(--border-color); padding:15px;">
+            <p style="margin-bottom:10px;">Если у тебя возникли вопросы, пиши создателю:</p>
+            <button class="main-btn" onclick="window.open('https://t.me/HEDYPA', '_blank')" style="width:100%; padding:12px; background:var(--accent-pink); border:none; border-radius:8px; color:#fff; font-weight:bold; cursor:pointer;">Написать в Telegram</button>
         </div>
     </div>
 
     <!-- ВЫВОД -->
     <div id="page-withdraw" class="page">
-        <div class="section-title">💸 Вывод средств</div>
-        
+        <h4>💸 Вывод средств</h4>
         <div class="form-group">
             <label>Сколько Y-Coins вывести?</label>
             <input type="number" id="w-amount" placeholder="Например: 150">
@@ -267,10 +216,10 @@
             <label>Твой Telegram (юзернейм)</label>
             <input type="text" id="w-user" placeholder="@username">
         </div>
-        <button class="main-btn" onclick="submitWithdraw()">📤 Подать заявку</button>
+        <button class="main-btn" onclick="submitWithdraw()" style="width:100%; padding:14px; background:var(--accent-pink); border:none; border-radius:12px; color:#fff; font-weight:bold; cursor:pointer; margin-top:10px;">📤 Подать заявку</button>
     </div>
 
-    <!-- АДМИН-ПАНЕЛЬ (Открывается только у Яны с юзернеймом @HEDYPA) -->
+    <!-- АДМИН-ПАНЕЛЬ -->
     <div id="admin-panel">
         <h3>🔐 Админ-панель</h3>
         <p style="font-size:13px; color:#888;">Только для создателя.</p>
@@ -298,7 +247,7 @@
     </div>
 
     <script>
-        // ===== ИНТЕГРАЦИЯ GIGAPUB (КОД, КОТОРЫЙ ТЫ СКОПИРОВАЛА) =====
+        // ===== ИНТЕГРАЦИЯ GIGAPUB =====
         document.addEventListener('DOMContentLoaded', function() {
             if (!window.loadOfferWallSDK) {
                 const script = document.createElement('script');
@@ -308,10 +257,10 @@
             }
         });
 
-        // ===== ФУНКЦИЯ ОТКРЫТИЯ ЗАДАНИЙ =====
+        // ===== ОТКРЫТИЕ ЗАДАНИЙ =====
         function openOfferWall() {
-            if (window.loadOfferWallSDK) {
-                window.loadOfferWallSDK({
+            if (typeof loadOfferWallSDK === 'function') {
+                loadOfferWallSDK({
                     projectId: 7301,
                     onReward: function(data) {
                         let earned = parseInt(data.amount) || 10;
@@ -326,22 +275,42 @@
                     }
                 });
             } else {
-                alert("SDK ещё загружается, подожди немного...");
+                alert("SDK GigaPub ещё загружается. Подожди 5 секунд и нажми снова!");
             }
         }
 
-        // ===== ЛОГИКА БАЛАНСА =====
+        // ===== БАЛАНС И СТАТИСТИКА =====
         let balance = parseInt(localStorage.getItem('user_balance')) || 0;
         let done = parseInt(localStorage.getItem('tasks_done')) || 0;
         let pending = parseInt(localStorage.getItem('tasks_pending')) || 0;
 
         function updateUI() {
-            document.getElementById('user-balance').innerText = balance + ' Y-Coins';
+            document.getElementById('user-balance').innerText = balance;
             document.getElementById('stat-balance').innerText = balance;
+            document.getElementById('stat-balance-top').innerText = balance;
             document.getElementById('stat-done').innerText = done;
             document.getElementById('stat-pending').innerText = pending;
         }
         updateUI();
+
+        // ===== ГЕНЕРАЦИЯ 50 ЗАДАНИЙ =====
+        function generateTasks() {
+            const grid = document.getElementById('tasks-grid');
+            grid.innerHTML = '';
+            const rewards = [5, 10, 15, 20, 25, 30, 50, 100, 150, 200];
+            for (let i = 1; i <= 50; i++) {
+                let reward = rewards[i % rewards.length];
+                let taskHTML = `
+                    <div class="task-item">
+                        <div class="title">Задание #${i}</div>
+                        <div class="reward">+${reward} Y-Coins</div>
+                        <button onclick="openOfferWall()">Выполнить</button>
+                    </div>
+                `;
+                grid.innerHTML += taskHTML;
+            }
+        }
+        generateTasks();
 
         // ===== ПЕРЕКЛЮЧЕНИЕ СТРАНИЦ =====
         function switchPage(pageId, btn) {
@@ -373,25 +342,21 @@
             updateUI();
 
             alert('✅ Заявка отправлена! Ожидай ответа.');
-            // Очистить поля
             document.getElementById('w-amount').value = '';
             document.getElementById('w-user').value = '';
             document.getElementById('w-method').value = '';
             document.getElementById('w-ref').value = '';
-            showAdminPanel(); // обновить админку
+            showAdminPanel();
         }
 
-        // ===== АДМИН-ПАНЕЛЬ (видна только тебе @HEDYPA) =====
+        // ===== АДМИН-ПАНЕЛЬ =====
         function showAdminPanel() {
-            let tgUser = "test_user";
             let tgUsername = "";
-            
             if (window.Telegram && window.Telegram.WebApp) {
                 window.Telegram.WebApp.ready();
                 window.Telegram.WebApp.expand();
                 const user = window.Telegram.WebApp.initDataUnsafe.user;
                 if (user) {
-                    tgUser = user.id || "test_user";
                     tgUsername = user.username || "";
                 }
             }
