@@ -9,7 +9,7 @@
             --bg-color: #F8F4FF;
             --text-color: #2C3E50;
             --accent-pink: #FFF0F5;
-            --accent-blue: #EBF2FE;
+            --accent-blue: #E8F2FE;
             --card-white: #FFFFFF;
             --text-main: #333333;
         }
@@ -63,7 +63,9 @@
             padding: 25px;
             border-radius: 24px;
             text-align: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            border-left: 4px solid #007AFF;
+            max-width: 100%;
         }
 
         .btn {
@@ -127,26 +129,37 @@
             padding-left: 10px;
             margin-bottom: 15px;
         }
+        
+        .stats-table-orange {
+            border-left: 4px solid #FFCC00;
+            padding-left: 10px;
+            margin-bottom: 15px;
+        }
+
         .stats-row { margin: 8px 0; font-size: 14px; }
 
         select, input[type="number"], input[type="text"] {
-            width: 100%; padding: 12px; margin-top: 8px; margin-bottom: 15px; border: 1px solid #E8E8E9; border-radius: 12px; box-sizing: border-box; background: #fff; outline: none;
+            width: 100%; padding: 12px; margin-top: 8px; margin-bottom: 15px; 
+            border: 1px solid #E8E8E9; border-radius: 12px; box-sizing: border-box; 
+            background: #fff; outline: none;
         }
+
         label { font-size: 14px; font-weight: 500; display: block; margin-top: 10px; }
     </style>
 </head>
 <body>
 
+    <!-- ВЕРХНИЙ БАЛАНС -->
     <div id="balance-badge">💵 <span id="global-balance">0</span> U-COINS</div>
 
     <!-- 1. ЗАДАНИЯ -->
     <div id="tasks-page" class="content active">
-        <div class="welcome-box" style="margin-bottom: 25px; max-width: 100%;">
-            <h2 style="margin-top:0; color:#007AFF;">Привет! 👋</h2>
-            <p style="font-size: 14px; line-height: 1.5; margin: 0;">Я очень рада, что ты посещаешь мои mini-приложения. Выполняй задания и зарабатывай коины!</p>
+        <div class="welcome-box">
+            <h2 style="margin-top: 0; color: #007AFF;">Привет! 👋</h2>
+            <p style="font-size: 14px; line-height: 1.5; margin: 0;">Я очень рада, что ты посещаешь мои мини-приложения. Выполняй задания и зарабатывай коины!</p>
         </div>
-        <h3 style="margin-left: 5px;">🔥 Доступные задания:</h3>
-        <p style="font-size:13px; color:#8E8E93; margin-top: -10px; margin-bottom: 20px; margin-left: 5px;">Задания обновляются каждый день автоматически! ✨</p>
+        <h3 style="margin-top: 15px;">🔥 Доступные задания:</h3>
+        <p style="font-size: 13px; color: #8E8E93; margin-top: -10px; margin-bottom: 20px; margin-left: 5px;">Задания обновляются каждый день автоматически! ✨</p>
         <div id="cards-container"></div>
     </div>
 
@@ -159,138 +172,181 @@
             <div class="stats-row">Завершено задач: <span id="stat-done-count">0 шт.</span></div>
         </div>
         <h3>⏳ Задания в проверке</h3>
-        <div class="stats-table" style="border-left-color: #FFCC00;">
-            <div class="stats-row">Ожидают проверки: <span id="stat-check-count">0</span> задач</div>
+        <div class="stats-table-orange">
+            <div class="stats-row">Ожидает проверки: <span id="stat-check-count">0</span> задач</div>
         </div>
     </div>
 
     <!-- 3. ПОДДЕРЖКА -->
     <div id="support-page" class="content">
-        <h2>📬 Поддержка</h2>
-        <div class="welcome-box" style="border-left: 4px solid #007AFF; text-align: left; max-width:100%;">
-            <p style="font-size:15px; margin: 0 0 15px 0;">Если у вас есть какие-то вопросы или вы хотели что-то предложить, напишите нам:</p>
+        <h2>✉️ Поддержка</h2>
+        <div class="welcome-box">
+            <p style="font-size: 15px; margin: 0 0 15px 0;">Если у вас есть какие-то вопросы или вы хотели что-то предложить, напишите нам:</p>
             <a href="https://t.me" target="_blank" class="btn btn-blue" style="display:inline-block; width:auto;">Написать в поддержку</a>
         </div>
     </div>
 
-    <!-- 4. ВЫВОД -->
+    <!-- 4. ВЫВОД СРЕДСТВ -->
     <div id="withdraw-page" class="content">
         <h2>💳 Вывод средств</h2>
-        <p style="font-size:13px; color:#8E8E93; margin-bottom:15px;">Минимальная сумма на телефон — 100 ₽. На карту банка — 150 ₽.</p>
+        <p style="font-size: 13px; color: #8E8E93; margin-bottom: 15px;">Минимальная сумма на телефон — 100 ₽. На карту банка — 150 ₽.</p>
         
         <label>1. Сколько вы хотите вывести:</label>
         <input type="number" id="withdraw-amount" placeholder="Введите сумму U-COINS">
-        
+
         <label>2. Выберите банк:</label>
         <select id="withdraw-method">
-            <option value="sbp">🟢 СБП (По номеру телефона)</option>
-            <option value="sber">🟢 Сбербанк</option>
-            <option value="tinkoff">🟡 Т-Банк (Тинькофф)</option>
-            <option value="alpha">🔴 Альфа-Банк</option>
+            <option value="sbp">СБП (По номеру телефона)</option>
+            <option value="sber">Сбербанк</option>
+            <option value="tinkoff">Т-Банк (Тинькофф)</option>
+            <option value="alpha">Альфа-банк</option>
         </select>
 
         <label>3. От какого вы реферала (выберите из списка):</label>
         <select id="withdraw-ref">
-            <option value="Реферал 1">👤 Реферал 1</option>
-            <option value="Реферал 2">👤 Реферал 2</option>
-            <option value="Реферал 3">👤 Реферал 3</option>
-            <option value="Реферал 4">👤 Реферал 4</option>
-            <option value="Реферал 5">👤 Реферал 5</option>
-            <option value="Реферал 6">👤 Реферал 6</option>
+            <option value="Реферал 1">Реферал 1</option>
+            <option value="Реферал 2">Реферал 2</option>
+            <option value="Реферал 3">Реферал 3</option>
+            <option value="Реферал 4">Реферал 4</option>
         </select>
-        
+
         <label>4. Реквизиты для перевода:</label>
         <input type="text" id="withdraw-wallet" placeholder="Номер карты или телефона для СБП">
-        
+
         <button class="btn btn-blue" onclick="sendWithdraw()">Коснитесь, чтобы вывести</button>
     </div>
 
-    <!-- НИЖНИЕ КНОПКИ -->
+    <!-- НИЖНЕЕ МЕНЮ НАВИГАЦИИ -->
     <div class="tab-bar">
         <div class="tab-item active" onclick="switchTab('tasks-page', this)">
-            <span class="tab-icon">📋</span><span>Задания</span>
+            <span class="tab-icon">📋</span>
+            <span>Задания</span>
         </div>
         <div class="tab-item" onclick="switchTab('stats-page', this)">
-            <span class="tab-icon">📊</span><span>Статистика</span>
+            <span class="tab-icon">📊</span>
+            <span>Статистика</span>
         </div>
         <div class="tab-item" onclick="switchTab('support-page', this)">
-            <span class="tab-icon">📬</span><span>Поддержка</span>
+            <span class="tab-icon">📬</span>
+            <span>Поддержка</span>
         </div>
         <div class="tab-item" onclick="switchTab('withdraw-page', this)">
-            <span class="tab-icon">💳</span><span>Вывод</span>
+            <span class="tab-icon">💳</span>
+            <span>Вывод</span>
         </div>
     </div>
+    
+    <!-- ЛОГИКА ПРИЛОЖЕНИЯ -->
     <script>
-let balance = parseInt(localStorage.getItem('user_balance')) || 0;
-let completedTasks = parseInt(localStorage.getItem('completed_tasks')) || 0;
-let pendingTasks = parseInt(localStorage.getItem('pending_tasks')) || 0;
+    // Загрузка данных пользователя из памяти устройства
+    let balance = parseInt(localStorage.getItem('user_balance')) || 0;
+    let completedTasks = parseInt(localStorage.getItem('completed_tasks')) || 0;
+    let pendingTasks = parseInt(localStorage.getItem('pending_tasks')) || 0;
 
-function generate100Cards() {
-    const container = document.getElementById('cards-container');
-    if (!container) return;
-    container.innerHTML = '';
-    const rewardsList =;
-    for (let i = 1; i <= 100; i++) {
-        let reward = rewardsList[i % rewardsList.length];
-        container.innerHTML += `
-            <div class="task-card">
-                <div>
-                    <b style="font-size: 15px; display: block; color: #2C3E50 !important;">Быстрое задание #${i}</b>
-                    <span style="font-size: 13px; color: #8E8E93 !important;">Награда: +${reward} U-COINS</span>
+    // Массив наград для заданий (теперь он заполнен и не выдает ошибку)
+    const rewardList = Array(5, 10, 15, 20, 25);
+    // Генерация ровно 100 карточек с заданиями
+    function generate100Cards() {
+        const container = document.getElementById('cards-container');
+        if (!container) return;
+        
+        container.innerHTML = '';
+        
+        for (let i = 1; i <= 100; i++) {
+            let reward = rewardList[i % rewardList.length];
+            
+            container.innerHTML += `
+                <div class="task-card">
+                    <div>
+                        <b style="font-size: 15px; display: block; color: #2C3E50 !important;">Быстрое задание #${i}</b>
+                        <span style="font-size: 13px; color: #8E8E93 !important;">Награда: +${reward} U-COINS</span>
+                    </div>
+                    <a href="https://omg10.com" target="_blank" class="btn btn-blue" onclick="completeTaskSimulate(${reward})">Выполнить</a>
                 </div>
-                <a href="https://omg10.com" target="_blank" class="btn" onclick="completeTaskSimulate(${reward})">Выполнить</a>
-            </div>
-        `;
+            `;
+        }
     }
-}
 
-generate100Cards();
-updateUI();
+    // Логика переключения экранов меню
+    function switchTab(pageId, element) {
+        document.querySelectorAll('.content').forEach(p => {
+            p.classList.remove('active');
+        });
+        
+        document.querySelectorAll('.tab-item').forEach(t => {
+            t.classList.remove('active');
+        });
+        
+        const targetPage = document.getElementById(pageId);
+        if (targetPage) {
+            targetPage.classList.add('active');
+        }
+        if (element) {
+            element.classList.add('active');
+        }
+    }
 
-function switchTab(pageId, element) {
-    document.querySelectorAll('.content').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-    document.getElementById(pageId).classList.add('active');
-    element.classList.add('active');
-}
+    // Нажатие на кнопку выполнения задания
+    function completeTaskSimulate(reward) {
+        pendingTasks += 1;
+        balance += reward;
+        
+        localStorage.setItem('pending_tasks', pendingTasks);
+        localStorage.setItem('user_balance', balance);
+        
+        updateUI();
+    }
 
-function completeTaskSimulate(reward) {
-    pendingTasks += 1;
-    balance += reward;
-    localStorage.setItem('pending_tasks', pendingTasks);
-    localStorage.setItem('user_balance', balance);
+    // Обновление числовых показателей на экране
+    function updateUI() {
+        const globalBalance = document.getElementById('global-balance');
+        const statCoins = document.getElementById('stat-done-coins');
+        const statCount = document.getElementById('stat-done-count');
+        const statCheck = document.getElementById('stat-check-count');
+        
+        if (globalBalance) globalBalance.innerText = balance;
+        if (statCoins) statCoins.innerText = balance;
+        if (statCount) statCount.innerText = completedTasks + " шт.";
+        if (statCheck) statCheck.innerText = pendingTasks;
+    }
+
+    // Обработка формы вывода денег
+    function sendWithdraw() {
+        let amountInput = document.getElementById('withdraw-amount');
+        let methodInput = document.getElementById('withdraw-method');
+        let refNameInput = document.getElementById('withdraw-ref');
+        let walletInput = document.getElementById('withdraw-wallet');
+        
+        if (!amountInput || !methodInput || !walletInput) return;
+        
+        let amount = parseInt(amountInput.value);
+        let method = methodInput.value;
+        let refName = refNameInput ? refNameInput.value : '';
+        let wallet = walletInput.value.trim();
+        
+        if (isNaN(amount) || amount <= 0 || !wallet) {
+            alert('Пожалуйста, заполните все поля!');
+            return;
+        }
+        
+        if (amount > balance) {
+            alert('Недостаточно коинов на балансе!');
+            return;
+        }
+        
+        balance -= amount;
+        localStorage.setItem('user_balance', balance);
+        updateUI();
+        
+        alert(`Заявка создана!\nСумма: ${amount} коинов\nМетод: ${method.toUpperCase()}\nРеквизиты: ${wallet}\n\nСделайте скриншот и отправьте его в поддержку!`);
+        
+        amountInput.value = '';
+        walletInput.value = '';
+    }
+
+    // Запуск функций при загрузке приложения
+    generate100Cards();
     updateUI();
-}
-
-function updateUI() {
-    document.getElementById('global-balance').innerText = balance;
-    document.getElementById('stat-done-coins').innerText = balance;
-    document.getElementById('stat-done-count').innerText = completedTasks + ' шт.';
-    document.getElementById('stat-check-count').innerText = pendingTasks;
-}
-
-function sendWithdraw() {
-    let amount = document.getElementById('withdraw-amount').value;
-    let method = document.getElementById('withdraw-method').value;
-    let refName = document.getElementById('withdraw-ref').value;
-    let wallet = document.getElementById('withdraw-wallet').value;
-    
-    amount = parseInt(amount);
-    if (isNaN(amount) || amount <= 0 || !wallet) {
-        alert('Пожалуйста, заполните все поля!');
-        return;
-    }
-    if (amount > balance) {
-        alert('Недостаточно коинов на балансе!');
-        return;
-    }
-    
-    balance -= amount;
-    localStorage.setItem('user_balance', balance);
-    updateUI();
-    
-    alert(`Заявка создана!\nСумма: ${amount} коинов\nМетод: ${method.toUpperCase()}\nРеквизиты: ${wallet}\n\nСделайте скриншот этого окна и отправьте в Поддержку! Ваш реферал: ${refName}`);
-}
-</script>
+    </script>
 </body>
 </html>
