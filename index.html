@@ -2,332 +2,308 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <!-- ЖЕСТКО БЛОКИРУЕМ МАСШТАБ, ЧТОБЫ ЭКРАН НЕ СЪЕЗЖАЛ -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>YANISY Mini App</title>
     <style>
         :root {
-            --bg-color: #F0F4FF;
+            --bg-color: #F8F4FF;
             --text-color: #2C3E50;
             --accent-pink: #FFF0F5;
-            --accent-blue: #E0F2FE;
+            --accent-blue: #EBF2FE;
             --card-white: #FFFFFF;
             --text-main: #333333;
         }
 
         body {
-            background-color: var(--bg-color) !important;
-            color: var(--text-color) !important;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            padding: 0; margin: 0;
-            display: flex; flex-direction: column;
-            height: 100vh; overflow: hidden;
-            -webkit-user-select: none; user-select: none;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
         }
+
+        #balance-badge {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background: var(--card-white);
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+            box-shadow: 0 4px 10px rgba(0, 122, 255, 0.08);
+            border: 1px solid var(--accent-blue);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--text-color);
+        }
+
+        #balance-badge span { color: #007AFF; font-weight: bold; }
 
         .content {
-            flex: 1; padding: 20px; margin-top: 60px;
-            overflow-y: auto; display: none;
-            padding-bottom: 90px; box-sizing: border-box;
+            flex: 1;
+            padding: 20px;
+            margin-top: 50px;
+            overflow-y: auto;
+            display: none;
+            padding-bottom: 90px;
+            box-sizing: border-box;
         }
 
-        .content.active { display: block !important; }
+        .content.active { display: block; }
 
         .welcome-box {
-            background: var(--card-white) !important;
-            padding: 25px; border-radius: 24px; text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            background: var(--card-white);
+            padding: 25px;
+            border-radius: 24px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
-
-        .balance-badge {
-            position: fixed; top: 15px; left: 15px;
-            background: var(--card-white) !important;
-            padding: 8px 14px; border-radius: 20px;
-            font-weight: bold; font-size: 14px;
-            box-shadow: 0 4px 10px rgba(0, 122, 255, 0.08);
-            border: 1px solid var(--accent-blue) !important;
-            z-index: 10000; display: flex; align-items: center; gap: 5px;
-        }
-
-        .balance-badge span { color: #007AFF !important; }
 
         .btn {
-            background-color: #007AFF !important; color: white !important;
-            border: none; padding: 15px; border-radius: 14px;
-            font-size: 16px; font-weight: 600; cursor: pointer;
-            text-align: center; text-decoration: none; display: block;
-            width: 100%; box-sizing: border-box; pointer-events: auto !important;
-            -webkit-tap-highlight-color: transparent; margin-bottom: 12px;
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            border: none;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            box-sizing: border-box;
         }
 
-        .btn-secondary {
-            background-color: #E5E5EA !important; color: #333333 !important;
-        }
+        .btn-blue { background: #007AFF; color: white; }
 
         .task-card {
-            background: var(--card-white) !important; padding: 18px;
-            border-radius: 20px; margin-bottom: 12px;
-            display: flex; justify-content: space-between; align-items: center;
-            border: 1px solid var(--accent-pink) !important;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.01);
+            background: var(--card-white);
+            padding: 15px;
+            border-radius: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
         }
 
-        .task-card .btn { width: auto; padding: 10px 18px; font-size: 13px; margin-bottom: 0; }
+        .task-card .btn { width: auto; margin-top: 0; padding: 8px 16px; background: #007AFF; color: white; font-size: 13px; }
+
+        .tab-bar {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            height: 70px;
+            background: var(--card-white);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid #E8E8E9;
+            z-index: 10000;
+        }
+
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            color: #8E8E93;
+            cursor: pointer;
+            flex: 1;
+            text-align: center;
+        }
+
+        .tab-item.active { color: #007AFF; font-weight: bold; }
+        .tab-icon { font-size: 20px; }
 
         .stats-table {
-            background: var(--card-white) !important; border-radius: 16px;
-            padding: 15px; margin-top: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+            border-left: 4px solid #007AFF;
+            padding-left: 10px;
+            margin-bottom: 15px;
         }
+        .stats-row { margin: 8px 0; font-size: 14px; }
 
-        .stats-row {
-            display: flex; justify-content: space-between;
-            padding: 12px 0; border-bottom: 1px solid #F2F2F7; font-size: 14px;
+        select, input[type="number"], input[type="text"] {
+            width: 100%; padding: 12px; margin-top: 8px; margin-bottom: 15px; border: 1px solid #E8E8E9; border-radius: 12px; box-sizing: border-box; background: #fff; outline: none;
         }
-
-        .stats-row:last-child { border-bottom: none; }
-
-        .input-field, .input-select {
-            width: 100%; padding: 14px; margin-top: 8px; margin-bottom: 15px;
-            box-sizing: border-box; background: var(--card-white) !important;
-            border: 1px solid #E5E5EA; color: #000000 !important;
-            border-radius: 14px; font-size: 15px; outline: none;
-        }
-
-        .tabs-panel {
-            position: fixed; bottom: 0; left: 0; right: 0;
-            display: flex; border-top: 1px solid #E5E5EA;
-            background-color: rgba(255, 255, 255, 0.9) !important;
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            padding-bottom: env(safe-area-inset-bottom); z-index: 9999;
-        }
-
-        .tab {
-            flex: 1; text-align: center; padding: 12px 0;
-            cursor: pointer; font-size: 11px; color: #8E8E93 !important;
-            display: flex; flex-direction: column; align-items: center;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .tab.active { color: #007AFF !important; font-weight: bold; }
-        .tab-icon { font-size: 20px; margin-bottom: 2px; }
+        label { font-size: 14px; font-weight: 500; display: block; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-    <!-- ЭКРАН ВВОДА ПРОМОКОДА ПРИ СТАРТЕ -->
-    <div id="promo-overlay" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: #F0F4FF; z-index: 999999; display: flex; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box;">
-        <div class="welcome-box" style="width: 100%; max-width: 340px; box-sizing: border-box;">
-            <h2 style="margin-top: 0; color: #007AFF !important;">Добро пожаловать! ✨</h2>
-            <p style="font-size: 14px; line-height: 1.5; color: #666666 !important; margin-bottom: 20px;">Введите секретный промокод вашего пригласителя, чтобы войти и забрать 30 коинов.</p>
-            <input type="text" id="promo-input" class="input-field" placeholder="Введите промокод..." style="text-align: center;">
-            <button type="button" class="btn" onclick="checkPromoCode();">Активировать</button>
-            <button type="button" class="btn btn-secondary" onclick="skipPromoCode();">У меня нет промокода ➡️</button>
-        </div>
-    </div>
+    <div id="balance-badge">💵 <span id="global-balance">0</span> U-COINS</div>
 
-    <!-- ТЕКУЩИЙ БАЛАНС -->
-    <div class="balance-badge" id="global-balance">☀️ <span>0</span> U-COINS</div>
-
-    <!-- ВКЛАДКА 1: ЗАДАНИЯ -->
+    <!-- 1. ЗАДАНИЯ -->
     <div id="tasks-page" class="content active">
-        <div class="welcome-box" style="margin-bottom: 25px;">
-            <h2 style="margin-top: 0; color: #007AFF !important;">Привет! 👋</h2>
-            <p style="font-size: 15px; line-height: 1.5; margin: 0;">Я очень рада, что ты посещаешь мое mini-приложение. Вот тебе приветственный бонус <b>30 коинов</b>.</p>
+        <div class="welcome-box" style="margin-bottom: 25px; max-width: 100%;">
+            <h2 style="margin-top:0; color:#007AFF;">Привет! 👋</h2>
+            <p style="font-size: 14px; line-height: 1.5; margin: 0;">Я очень рада, что ты посещаешь мои мини-приложения. Выполняй задания и зарабатывай коины!</p>
         </div>
-        <h3 style="margin-left: 5px;">Доступные задания:</h3>
+        <h3 style="margin-left: 5px;">🔥 Доступные задания:</h3>
+        <p style="font-size:13px; color:#8E8E93; margin-top: -10px; margin-bottom: 20px; margin-left: 5px;">Задания обновляются каждый день автоматически! ✨</p>
         <div id="cards-container"></div>
-        <p style="text-align: center; color: #8E8E93 !important; font-size: 12px; margin-top: 20px;">*Задания обновляются каждый день автоматически! ✨</p>
     </div>
-        <!-- ВКЛАДКА 2: СТАТИСТИКА -->
+
+    <!-- 2. СТАТИСТИКА -->
     <div id="stats-page" class="content">
-        <h3>Ваша статистика</h3>
+        <h2>📊 Твоя Статистика</h2>
+        <h3>✅ Все выполненные задания</h3>
         <div class="stats-table">
-            <div class="stats-row"><span>Выполнено коинов:</span><span style="color: #007AFF !important;"><b id="stat-done-coins">0</b> U-COINS</span></div>
-            <div class="stats-row"><span>Проверено заданий:</span><span><b id="stat-done-count">0</b> шт.</span></div>
+            <div class="stats-row">Всего заработано: <span id="stat-done-coins" style="color:#007AFF; font-weight:bold;">0</span> U-COINS</div>
+            <div class="stats-row">Завершено задач: <span id="stat-done-count">0 шт.</span></div>
         </div>
-        <h3>Информация о реферале</h3>
-        <div class="stats-table" style="border-left: 4px solid #FFCC00;">
-            <div class="stats-row"><span>В проверке:</span><span style="color: #FFCC00 !important;"><b id="stat-check-count">0</b> задач(а)</span></div>
-            <div class="stats-row"><span>Ваш admin:</span><span><b id="source-val" style="color: #007AFF !important;">Прямой вход</b></span></div>
+        <h3>⏳ Задания в проверке</h3>
+        <div class="stats-table" style="border-left-color: #FFCC00;">
+            <div class="stats-row">Ожидают проверки: <span id="stat-check-count">0</span> задач</div>
         </div>
     </div>
 
-    <!-- ВКЛАДКА 3: ПОДДЕРЖКА -->
+    <!-- 3. ПОДДЕРЖКА -->
     <div id="support-page" class="content">
-        <h3>Поддержка</h3>
-        <div class="welcome-box">
-            <p style="font-size: 15px; margin: 0; line-height: 1.5;">Если у вас возникли вопросы или вы хотите получить выплату, отправьте скриншот чека напрямую:</p>
-            <a href="https://t.me" target="_blank" class="btn" style="margin-top: 20px;">Написать в поддержку</a>
+        <h2>📬 Поддержка</h2>
+        <div class="welcome-box" style="border-left: 4px solid #007AFF; text-align: left; max-width:100%;">
+            <p style="font-size:15px; margin: 0 0 15px 0;">Если у вас есть какие-то вопросы или вы хотели что-то предложить, напишите нам:</p>
+            <a href="https://t.me" target="_blank" class="btn btn-blue" style="display:inline-block; width:auto;">Написать в поддержку</a>
         </div>
     </div>
 
-    <!-- ВКЛАДКА 4: ВЫВОД -->
+    <!-- 4. ВЫВОД -->
     <div id="withdraw-page" class="content">
-        <h3>Вывод средств</h3>
-        <p style="font-size: 13px; color: #8E8E93 !important;">*Минимальная сумма на телефон — 100 ₽. На карту банка — 150 ₽.</p>
+        <h2>💳 Вывод средств</h2>
+        <p style="font-size:13px; color:#8E8E93; margin-bottom:15px;">Минимальная сумма на телефон — 100 ₽. На карту банка — 150 ₽.</p>
         
-        <label>Введите сумму U-COINS:</label>
-        <input type="number" id="withdraw-amount" class="input-field" placeholder="0">
-
-        <label>Выберите банк:</label>
-        <select class="input-select" id="bank-select">
-            <option value="СБП">СБП (По номеру телефона)</option>
-            <option value="Сбербанк">Сбербанк</option>
-            <option value="Т-Банк">Т-Банк (Тинькофф)</option>
-            <option value="Альфа-Банк">Альфа-Банк</option>
+        <label>1. Сколько вы хотите вывести:</label>
+        <input type="number" id="withdraw-amount" placeholder="Введите сумму U-COINS">
+        
+        <label>2. Выберите банк:</label>
+        <select id="withdraw-method">
+            <option value="sbp">🟢 СБП (По номеру телефона)</option>
+            <option value="sber">🟢 Сбербанк</option>
+            <option value="tinkoff">🟡 Т-Банк (Тинькофф)</option>
+            <option value="alpha">🔴 Альфа-Банк</option>
         </select>
 
-        <label>Номер карты или телефона для СБП:</label>
-        <input type="text" id="wallet-input" class="input-field" placeholder="+7... или номер карты">
+        <!-- ТО САМОЕ КОЛЁСИКО ВЫБОРА РЕФЕРАЛОВ -->
+        <label>3. От какого вы реферала (выберите из списка):</label>
+        <select id="withdraw-ref">
+            <option value="Реферал 1">👤 Реферал 1</option>
+            <option value="Реферал 2">👤 Реферал 2</option>
+            <option value="Реферал 3">👤 Реферал 3</option>
+            <option value="Реферал 4">👤 Реферал 4</option>
+            <option value="Реферал 5">👤 Реферал 5</option>
+            <option value="Реферал 6">👤 Реферал 6</option>
+        </select>
         
-        <button type="button" class="btn" onclick="sendWithdraw();" style="margin-top: 10px;">Коснитесь, чтобы вывести</button>
+        <label>4. Реквизиты для перевода:</label>
+        <input type="text" id="withdraw-wallet" placeholder="Номер карты или телефона для СБП">
+        
+        <button class="btn btn-blue" onclick="sendWithdraw()">Коснитесь, чтобы вывести</button>
     </div>
 
-    <!-- НИЖНЕЕ МЕНЮ НАВИГАЦИИ -->
-    <div class="tabs-panel">
-        <div class="tab active" onclick="switchPage('tasks-page', this)"><span class="tab-icon">📋</span><span>Задания</span></div>
-        <div class="tab" onclick="switchPage('stats-page', this)"><span class="tab-icon">📊</span><span>Статистика</span></div>
-        <div class="tab" onclick="switchPage('support-page', this)"><span class="tab-icon">💬</span><span>Поддержка</span></div>
-        <div class="tab" onclick="switchPage('withdraw-page', this)"><span class="tab-icon">💰</span><span>Вывод</span></div>
-    </div>
+    <!-- НИЖНИЕ КНОПКИ МЕНЮ -->
+    <div class="tab-bar">
+        <div class="tab-item active" onclick="switchTab('tasks-page', this)">
+            <span class="tab-icon">📋</span><span>Задания</span>
+        </div>
+        <div class="tab-item" onclick="switchTab('stats-page', this)">
+            <span class="tab-icon">📊</span><span>Статистика</span>
+        </div>
+        <div class="tab-item" onclick="switchTab('support-page', this)">
+            <span class="tab-icon">📬</span><span>Поддержка</span>
+        </div>
+        <div class="tab-item" onclick="switchTab('withdraw-page', this)">
+            <span class="tab-icon">💳</span><span>Вывод</span>
+            </div>
+<script>
+// Загрузка сохраненного прогресса из памяти устройства
+let balance = parseInt(localStorage.getItem('user_balance')) || 0;
+let completedTasks = parseInt(localStorage.getItem('completed_tasks')) || 0;
+let pendingTasks = parseInt(localStorage.getItem('pending_tasks')) || 0;
 
-    <!-- ЛОГИКА ПРИЛОЖЕНИЯ -->
-    <script>
-        let userBalance = parseInt(localStorage.getItem('user_balance')) || 0;
-        let completedTasks = JSON.parse(localStorage.getItem('completed_tasks')) || [];
-        let pendingTasks = JSON.parse(localStorage.getItem('pending_tasks')) || [];
-        let userSource = localStorage.getItem('user_source') || '';
-        let promoEntered = localStorage.getItem('promo_entered') || 'false';
+// Автоматическая генерация 100 карточек для заработка на Monetag
+function generate100Cards() {
+    const container = document.getElementById('cards-container');
+    if (!container) return;
+    container.innerHTML = '';
+    
+    // МЫ ДОБАВИЛИ НАГРАДЫ: за задания будут давать 10, 15, 20 или 25 коинов
+    const rewardsList =; 
+    
+    for (let i = 1; i <= 100; i++) {
+        let reward = rewardsList[i % rewardsList.length];
+        container.innerHTML += `
+            <div class="task-card">
+                <div>
+                    <b style="font-size: 15px; display: block; color: #2C3E50 !important;">Быстрое задание #${i}</b>
+                    <span style="font-size: 13px; color: #8E8E93 !important;">Награда: +${reward} U-COINS</span>
+                </div>
+                <a href="https://omg10.com" target="_blank" class="btn" onclick="completeTaskSimulate(${reward})">Выполнить</a>
+            </div>
+        `;
+    }
+}
 
-        const validPromos = ["косметичка", "птичка", "ириска", "малинка"];
-        const rewardsList =;
+// Запуск функций при открытии приложения
+generate100Cards();
+updateUI();
 
-        function initApp() {
-            document.querySelector('#global-balance span').innerText = userBalance;
-            document.getElementById('stat-done-coins').innerText = userBalance;
-            document.getElementById('stat-done-count').innerText = completedTasks.length;
-            document.getElementById('stat-check-count').innerText = pendingTasks.length;
-            if (userSource) {
-                document.getElementById('source-val').innerText = userSource;
-            }
-        }
+// Функция плавного переключения вкладок в нижнем меню
+function switchTab(pageId, element) {
+    document.querySelectorAll('.content').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+    document.getElementById(pageId).classList.add('active');
+    element.classList.add('active');
+}
 
-        function generate100Cards() {
-            const container = document.getElementById('cards-container');
-            if (!container) return;
-            container.innerHTML = '';
-            
-            for (let i = 1; i <= 100; i++) {
-                const reward = rewardsList[i % rewardsList.length];
-                container.innerHTML += `
-                    <div class="task-card">
-                        <div>
-                            <b style="font-size: 15px; display: block; color: #2C3E50 !important;">Быстрое задание #${i}</b>
-                            <span style="font-size: 13px; color: #8E8E93 !important;">Награда: +${reward} U-COINS</span>
-                        </div>
-                        <a href="https://omg10.com" target="_blank" class="btn" onclick="completeTaskSimulate(${i}, ${reward})">Выполнить</a>
-                    </div>
-                `;
-            }
-        }
+// Симуляция клика по заданию (награда начисляется, счётчик увеличивается)
+function completeTaskSimulate(reward) {
+    pendingTasks += 1;
+    balance += reward; // Коины прибавляются за каждый клик!
+    localStorage.setItem('pending_tasks', pendingTasks);
+    localStorage.setItem('user_balance', balance);
+    updateUI();
+}
 
-        function checkPromoCode() {
-            const input = document.getElementById('promo-input');
-            const cleanCode = input.value.trim().toLowerCase();
+// Обновление всех цифр и балансов на экранах в реальном времени
+function updateUI() {
+    document.getElementById('global-balance').innerText = balance;
+    document.getElementById('stat-done-coins').innerText = balance;
+    document.getElementById('stat-done-count').innerText = completedTasks + ' шт.';
+    document.getElementById('stat-check-count').innerText = pendingTasks;
+}
 
-            if (validPromos.includes(cleanCode)) {
-                userBalance = 30;
-                userSource = cleanCode;
-                promoEntered = 'true';
-                
-                localStorage.setItem('user_balance', userBalance);
-                localStorage.setItem('user_source', userSource);
-                localStorage.setItem('promo_entered', promoEntered);
-                
-                document.getElementById('promo-overlay').style.display = 'none';
-                initApp();
-                alert('Промокод успешно активирован! Вам начислено 30 U-COINS.');
-            } else {
-                input.style.borderColor = '#FF3B30';
-                alert('Неверный секретный промокод. Попробуйте еще раз.');
-            }
-        }
-
-        function skipPromoCode() {
-            userBalance = 0;
-            userSource = 'Прямой вход';
-            promoEntered = 'true';
-            
-            localStorage.setItem('user_balance', userBalance);
-            localStorage.setItem('user_source', userSource);
-            localStorage.setItem('promo_entered', promoEntered);
-            
-            document.getElementById('promo-overlay').style.display = 'none';
-            initApp();
-        }
-
-        function completeTaskSimulate(taskId, reward) {
-            if (!pendingTasks.includes(taskId) && !completedTasks.includes(taskId)) {
-                pendingTasks.push(taskId);
-                localStorage.setItem('pending_tasks', JSON.stringify(pendingTasks));
-                
-                userBalance += reward;
-                localStorage.setItem('user_balance', userBalance);
-                
-                initApp();
-            }
-        }
-
-        function switchPage(pageId, element) {
-            const contents = document.querySelectorAll('.content');
-            contents.forEach(content => content.classList.remove('active'));
-            
-            const tabs = document.querySelectorAll('.tab');
-            tabs.forEach(tab => tab.classList.remove('active'));
-            
-            document.getElementById(pageId).classList.add('active');
-            element.classList.add('active');
-        }
-
-        function sendWithdraw() {
-            const amountInput = document.getElementById('withdraw-amount');
-            const walletInput = document.getElementById('wallet-input');
-            const bankSelect = document.getElementById('bank-select');
-            
-            const amount = parseInt(amountInput.value) || 0;
-            const wallet = walletInput.value.trim();
-            const bank = bankSelect.value;
-
-            if (amount <= 0 || wallet === '') {
-                alert('Пожалуйста, заполните все поля корректно!');
-                return;
-            }
-
-            if (amount > userBalance) {
-                alert('Недостаточно U-COINS на балансе!');
-                return;
-            }
-
-            userBalance = Math.max(0, userBalance - amount);
-            localStorage.setItem('user_balance', userBalance);
-            
-            initApp();
-
-            alert(`Заявка создана!\n\nСумма: ${amount} U-COINS\nМетод: [${bank.toUpperCase()}]\nРеквизиты: ${wallet}\n\nСделайте скриншот этого окна и отправьте в Поддержку! Ваш админ: ${userSource}`);
-            
-            amountInput.value = '';
-            walletInput.value = '';
-        }
-
-        window.onload = function() {
-            generate100Cards();
-            if (promoEntered === 'true') {
-                document.getElementById('promo-overlay').style.display = 'none';
-                initApp();
-            } else {
-                document.getElementById('promo-overlay').style.display = 'flex';
-            }
-        };
-    </script>
+// Логика нажатия на кнопку "Вывести"
+function sendWithdraw() {
+    let amount = document.getElementById('withdraw-amount').value;
+    let method = document.getElementById('withdraw-method').value;
+    let refName = document.getElementById('withdraw-ref').value;
+    let wallet = document.getElementById('withdraw-wallet').value;
+    
+    amount = parseInt(amount);
+    
+    if (isNaN(amount) || amount <= 0 || !wallet) {
+        alert('Пожалуйста, заполните все поля!');
+        return;
+    }
+    
+    if (amount > balance) {
+        alert('Недостаточно коинов на балансе!');
+        return;
+    }
+    
+    balance -= amount;
+    localStorage.setItem('user_balance', balance);
+    updateUI();
+    
+    alert(`Заявка создана!\nСумма: ${amount} коинов\nМетод: ${method.toUpperCase()}\nРеквизиты: ${wallet}\n\nСделайте скриншот этого окна и отправьте в Поддержку! Ваш реферал: ${refName}`);
+}
+</script>
 </body>
 </html>
