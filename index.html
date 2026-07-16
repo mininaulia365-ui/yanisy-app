@@ -107,6 +107,7 @@
         .stat-row .label { color: #AAA; }
         .stat-row .value { color: var(--accent-pink); font-weight: bold; }
         #admin-panel {
+            display: none;
             background: var(--card-color);
             border: 2px solid var(--accent-pink);
             padding: 15px;
@@ -222,13 +223,27 @@
     </div>
 
     <script>
-        // ===== ДАННЫЕ =====
+        // ===== ИНТЕГРАЦИЯ С TELEGRAM =====
+        let tgUserId = "test_user";
+        let tgUsername = "";
+        let isInTelegram = false;
+
+        if (window.Telegram && window.Telegram.WebApp) {
+            window.Telegram.WebApp.ready();
+            window.Telegram.WebApp.expand();
+            const user = window.Telegram.WebApp.initDataUnsafe.user;
+            if (user) {
+                tgUserId = user.id || "test_user";
+                tgUsername = user.username || "";
+                isInTelegram = true;
+            }
+        }
+
+        // ===== БАЛАНС И СТАТИСТИКА =====
         let balance = parseInt(localStorage.getItem('user_balance')) || 0;
         let done = parseInt(localStorage.getItem('tasks_done')) || 0;
         let pending = parseInt(localStorage.getItem('tasks_pending')) || 0;
-        let withdrawRequests = JSON.parse(localStorage.getItem('withdraw_requests')) || [];
 
-        // ===== ОБНОВЛЕНИЕ UI =====
         function updateUI() {
             document.getElementById('user-balance').innerText = balance;
             document.getElementById('stat-balance').innerText = balance;
@@ -272,9 +287,14 @@
         }
         generateTasks();
 
-        // ===== ОТКРЫТИЕ СТЕНЫ ЗАДАНИЙ (Твоя ссылка Adsterra) =====
+        // ===== ОТКРЫТИЕ СТЕНЫ ЗАДАНИЙ (MONETAG) =====
         function openOfferWall() {
-            window.open('https://www.effectivecpmnetwork.com/vhzac380k?key=8458521c8995169f0b80adb22995dd6d', '_blank');
+            const offerLink = 'https://omg10.com/4/11302575';
+            if (isInTelegram) {
+                window.Telegram.WebApp.openLink(offerLink);
+            } else {
+                window.open(offerLink, '_blank');
+            }
         }
 
         // ===== ПЕРЕКЛЮЧЕНИЕ СТРАНИЦ =====
@@ -285,7 +305,7 @@
             btn.classList.add('active');
         }
 
-        // ===== ЗАЯВКА НА ВЫВОД =====
+        // ===== ЗАЯВКА НА ВЫВОД (Отправка в Telegram) =====
         function submitWithdraw() {
             let amount = parseInt(document.getElementById('w-amount').value);
             let method = document.getElementById('w-method').value;
@@ -294,54 +314,39 @@
             if (!amount || amount < 100) return alert('❌ Минимум: 100 Y-Coins');
             if (amount > balance) return alert('❌ Недостаточно Y-Coins');
 
-            let req = { amount, method, ref, time: new Date().toLocaleString() };
-            withdrawRequests.push(req);
-            localStorage.setItem('withdraw_requests', JSON.stringify(withdrawRequests));
-
+            // Списываем баланс
             balance -= amount;
             localStorage.setItem('user_balance', balance);
             updateUI();
 
-            alert('✅ Заявка отправлена! Ожидай ответа.');
+            // Формируем сообщение для бота
+            const message = `📩 **НОВАЯ ЗАЯВКА НА ВЫВОД**
+            
+👤 **Пользователь:** @${tgUsername} (ID: ${tgUserId})
+💰 **Сумма:** ${amount} Y-Coins
+🏦 **Способ:** ${method}
+👥 **Реферал:** ${ref}
+🕐 **Время:** ${new Date().toLocaleString()}`;
+
+            // Отправляем в Telegram (через ссылку с предзаполненным текстом)
+            const botToken = "ВАШ_ТОКЕН_БОТА"; // Токен твоего бота из @BotFather
+            const chatId = "ВАШ_ID"; // Твой Telegram ID (узнай через @userinfobot)
+            
+            const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}&parse_mode=Markdown`;
+            
+            fetch(url)
+                .then(response => {
+                    alert('✅ Заявка отправлена! Проверь чат с ботом.');
+                })
+                .catch(error => {
+                    alert('❌ Ошибка отправки заявки. Но деньги списаны. Запиши заявку вручную.');
+                });
+
             document.getElementById('w-amount').value = '';
             document.getElementById('w-method').value = 'sbp';
             document.getElementById('w-ref').value = 'none';
-            showAdminPanel();
+            document.getElementById('admin-list').innerHTML = 'Ожидание отправки...';
         }
-
-        // ===== АДМИН-ПАНЕЛЬ (Видна только тебе по юзернейму @HEDYPA) =====
-        function showAdminPanel() {
-            let tgUsername = "";
-            if (window.Telegram && window.Telegram.WebApp) {
-                window.Telegram.WebApp.ready();
-                window.Telegram.WebApp.expand();
-                const user = window.Telegram.WebApp.initDataUnsafe.user;
-                if (user) {
-                    tgUsername = user.username || "";
-                }
-            }
-
-            let list = document.getElementById('admin-list');
-            if (tgUsername.toLowerCase() === "hedypa") {
-                document.getElementById('admin-panel').style.display = 'block';
-                list.innerHTML = '';
-                if (withdrawRequests.length === 0) {
-                    list.innerHTML = 'Заявок пока нет.';
-                } else {
-                    withdrawRequests.forEach((r, i) => {
-                        list.innerHTML += `<div class="admin-row">
-                            <span>${r.amount} Y-Coins</span>
-                            <span>${r.method}</span>
-                            <span>Реферал: ${r.ref}</span>
-                            <span style="color:#888;">${r.time}</span>
-                        </div>`;
-                    });
-                }
-            } else {
-                list.innerHTML = 'Эта панель доступна только создателю.';
-            }
-        }
-        showAdminPanel();
     </script>
 </body>
 </html>
