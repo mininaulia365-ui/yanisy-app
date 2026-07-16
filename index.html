@@ -5,48 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>YANISY</title>
     <style>
-        :root {
-            --bg-color: #0A0A0A;
-            --text-color: #FFFFFF;
-            --accent-pink: #FF007F;
-            --card-color: #1A1A1A;
-            --border-color: #333333;
-        }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; }
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            background: #0A0A0A;
+            color: #fff;
             padding-bottom: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             min-height: 100vh;
         }
         #balance-bar {
-            position: sticky;
-            top: 0;
-            background: var(--bg-color);
+            width: 100%;
             padding: 15px 20px;
-            font-size: 18px;
+            background: #1A1A1A;
+            text-align: center;
+            font-size: 20px;
             font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border-color);
-            z-index: 10;
+            border-bottom: 1px solid #333;
         }
-        #balance-bar span { color: var(--accent-pink); }
-        .section-title { padding: 15px 20px 5px; font-size: 16px; color: #CCC; }
+        #balance-bar span { color: #FF007F; }
+        .page { display: none; width: 100%; max-width: 400px; padding: 20px; }
+        .page.active { display: block; }
         .bottom-nav {
             position: fixed;
             bottom: 0;
-            left: 0;
             width: 100%;
-            background: var(--bg-color);
-            border-top: 1px solid var(--border-color);
+            background: #1A1A1A;
+            border-top: 1px solid #333;
             display: flex;
             justify-content: space-around;
             padding: 10px 0 20px;
-            z-index: 100;
         }
-        .nav-item {
+        .nav-btn {
             background: none;
             border: none;
             color: #666;
@@ -56,135 +47,81 @@
             align-items: center;
             gap: 4px;
             cursor: pointer;
-            padding: 0 10px;
         }
-        .nav-item.active { color: var(--accent-pink); font-weight: bold; }
-        .nav-item svg { width: 24px; height: 24px; fill: currentColor; }
-        .page { display: none; padding: 0 20px; padding-bottom: 20px; }
-        .page.active { display: block; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; font-size: 14px; color: #AAA; margin-bottom: 5px; }
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            background: var(--card-color);
-            color: #fff;
-            font-size: 16px;
-        }
-        .form-group select { appearance: auto; }
-        .task-item {
-            background: var(--card-color);
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px solid var(--border-color);
-        }
-        .task-item .task-title { font-weight: bold; font-size: 15px; margin-bottom: 4px; }
-        .task-item .task-desc { font-size: 13px; color: #888; margin-bottom: 6px; }
-        .task-item button {
-            background: var(--accent-pink);
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            color: #fff;
-            cursor: pointer;
-            font-size: 13px;
-        }
-        .stat-row {
-            background: var(--card-color);
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            padding: 15px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-        }
-        .stat-row .label { color: #AAA; }
-        .stat-row .value { color: var(--accent-pink); font-weight: bold; }
-        #admin-panel {
-            display: none;
-            background: var(--card-color);
-            border: 2px solid var(--accent-pink);
-            padding: 15px;
-            border-radius: 12px;
-            margin-top: 20px;
-        }
-        #admin-panel h3 { color: var(--accent-pink); margin-bottom: 10px; }
-        .admin-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid var(--border-color);
-            font-size: 14px;
-            color: #AAA;
-        }
-        .admin-row span { color: #fff; }
-        .main-btn {
+        .nav-btn.active { color: #FF007F; }
+        .btn-pink {
             display: block;
-            width: calc(100% - 40px);
-            margin: 10px auto;
+            width: 100%;
             padding: 14px;
+            margin: 10px 0;
             border-radius: 12px;
             border: none;
-            background: var(--accent-pink);
+            background: #FF007F;
             color: #fff;
             font-size: 16px;
             font-weight: bold;
             text-align: center;
             cursor: pointer;
         }
+        .btn-dark {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0;
+            border-radius: 12px;
+            border: 1px solid #444;
+            background: #1A1A1A;
+            color: #fff;
+            font-size: 16px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            background: #1A1A1A;
+            color: #fff;
+            margin-bottom: 15px;
+        }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { color: #AAA; display: block; margin-bottom: 5px; }
+        .form-group select { background: #1A1A1A; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 8px; width: 100%; }
     </style>
 </head>
 <body>
-    <div id="balance-bar">
-        <span>🪙 <span id="user-balance">0</span> Y-Coins</span>
-    </div>
+
+    <div id="balance-bar">🪙 <span id="user-balance">0</span> Y-Coins</div>
 
     <div id="page-tasks" class="page active">
-        <div class="section-title">🔥 Доступные задания:</div>
-        <div id="tasks-grid"></div>
+        <h3 style="margin-bottom: 15px;">📋 Задания</h3>
+        <div style="background: #FF007F; padding: 15px; border-radius: 12px; margin-bottom: 20px; color: #fff;">
+            ⚠️ <b>Важно:</b> Перед переходом к заданиям выключи VPN, иначе они не откроются!
+        </div>
+        <button class="btn-pink" onclick="openOfferWall()">🚀 Перейти к заданиям</button>
     </div>
 
     <div id="page-stats" class="page">
-        <div class="section-title">📊 Твоя статистика</div>
-        <div class="stat-row">
-            <span class="label">✅ Выполнено:</span>
-            <span class="value" id="stat-done">0</span>
-        </div>
-        <div class="stat-row">
-            <span class="label">⏳ На проверке:</span>
-            <span class="value" id="stat-pending">0</span>
-        </div>
-        <div class="stat-row">
-            <span class="label">💰 Баланс:</span>
-            <span class="value" id="stat-balance">0</span>
-        </div>
-        <div id="admin-panel">
-            <h3>🔐 Админ-панель</h3>
-            <div id="admin-list">Загрузка...</div>
-        </div>
+        <h3 style="margin-bottom: 15px;">📊 Статистика</h3>
+        <div class="btn-dark">💰 Баланс: <span id="stat-balance">0</span> Y-Coins</div>
     </div>
 
     <div id="page-support" class="page">
-        <div class="section-title">🆘 Поддержка</div>
-        <button class="main-btn" onclick="window.open('https://t.me/HEDYPA', '_blank')">Написать создателю</button>
+        <h3 style="margin-bottom: 15px;">🆘 Поддержка</h3>
+        <button class="btn-pink" onclick="window.open('https://t.me/HEDYPA', '_blank')">Написать создателю</button>
     </div>
 
     <div id="page-withdraw" class="page">
-        <div class="section-title">💸 Вывод средств</div>
+        <h3 style="margin-bottom: 15px;">💸 Вывод</h3>
         <div class="form-group">
             <label>Сумма (Y-Coins)</label>
-            <input type="number" id="w-amount" placeholder="Например: 100">
+            <input class="input-field" id="w-amount" placeholder="Например: 100" type="number">
         </div>
         <div class="form-group">
             <label>Куда вывести?</label>
-            <select id="w-method">
-                <option value="sbp">СБП (по номеру телефона)</option>
+            <select class="input-field" id="w-method">
+                <option value="sbp">СБП</option>
                 <option value="tinkoff">Тинькофф</option>
                 <option value="sber">Сбербанк</option>
                 <option value="alfa">Альфа-Банк</option>
@@ -192,7 +129,7 @@
         </div>
         <div class="form-group">
             <label>Кто тебя пригласил?</label>
-            <select id="w-ref">
+            <select class="input-field" id="w-ref">
                 <option value="none">— Самостоятельно —</option>
                 <option value="ref1">Реферал №1</option>
                 <option value="ref2">Реферал №2</option>
@@ -200,112 +137,45 @@
                 <option value="ref4">Реферал №4</option>
             </select>
         </div>
-        <button class="main-btn" onclick="submitWithdraw()">📤 Подать заявку</button>
+        <button class="btn-pink" onclick="submitWithdraw()">📤 Подать заявку</button>
     </div>
 
     <div class="bottom-nav">
-        <button class="nav-item active" onclick="switchPage('page-tasks', this)">
-            <svg viewBox="0 0 24 24"><path d="M4 6h16v2H4V6zm0 5h16v2H4v-2zm0 5h10v2H4v-2z"/></svg>
-            Задания
-        </button>
-        <button class="nav-item" onclick="switchPage('page-stats', this)">
-            <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
-            Статистика
-        </button>
-        <button class="nav-item" onclick="switchPage('page-support', this)">
-            <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
-            Поддержка
-        </button>
-        <button class="nav-item" onclick="switchPage('page-withdraw', this)">
-            <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
-            Вывод
-        </button>
+        <button class="nav-btn active" onclick="switchPage('page-tasks', this)">📋 Задания</button>
+        <button class="nav-btn" onclick="switchPage('page-stats', this)">📊 Статистика</button>
+        <button class="nav-btn" onclick="switchPage('page-support', this)">🆘 Поддержка</button>
+        <button class="nav-btn" onclick="switchPage('page-withdraw', this)">💸 Вывод</button>
     </div>
 
     <script>
-        // ===== ИНТЕГРАЦИЯ С TELEGRAM =====
-        let tgUserId = "test_user";
-        let tgUsername = "";
-        let isInTelegram = false;
-
-        if (window.Telegram && window.Telegram.WebApp) {
-            window.Telegram.WebApp.ready();
-            window.Telegram.WebApp.expand();
-            const user = window.Telegram.WebApp.initDataUnsafe.user;
-            if (user) {
-                tgUserId = user.id || "test_user";
-                tgUsername = user.username || "";
-                isInTelegram = true;
-            }
-        }
-
-        // ===== БАЛАНС И СТАТИСТИКА =====
+        // ===== БАЛАНС =====
         let balance = parseInt(localStorage.getItem('user_balance')) || 0;
-        let done = parseInt(localStorage.getItem('tasks_done')) || 0;
-        let pending = parseInt(localStorage.getItem('tasks_pending')) || 0;
 
         function updateUI() {
             document.getElementById('user-balance').innerText = balance;
             document.getElementById('stat-balance').innerText = balance;
-            document.getElementById('stat-done').innerText = done;
-            document.getElementById('stat-pending').innerText = pending;
         }
         updateUI();
 
-        // ===== ГЕНЕРАЦИЯ 30 ЗАДАНИЙ =====
-        function generateTasks() {
-            const grid = document.getElementById('tasks-grid');
-            grid.innerHTML = '';
-            const tasks = [
-                { name: "Пройди опрос о фильмах", desc: "Ответь на 5 вопросов о кино", reward: 15 },
-                { name: "Скачай приложение-игру", desc: "Установи и открой", reward: 20 },
-                { name: "Подпишись на канал YANISY", desc: "Останься на 7 дней", reward: 10 },
-                { name: "Пройди опрос о моде", desc: "Расскажи о своих предпочтениях", reward: 15 },
-                { name: "Скачай фитнес-приложение", desc: "Открой после установки", reward: 20 },
-                { name: "Подпишись на канал", desc: "Подпишись и останься", reward: 10 },
-                { name: "Пройди опрос о еде", desc: "Ответь на 5 вопросов", reward: 15 },
-                { name: "Скачай игру-головоломку", desc: "Установи и открой", reward: 20 },
-                { name: "Подпишись на Telegram-канал", desc: "Останься подписанным", reward: 10 },
-                { name: "Пройди опрос о путешествиях", desc: "Ответь на короткий опрос", reward: 15 },
-                { name: "Скачай полезное приложение", desc: "Установи и запусти", reward: 20 },
-                { name: "Подпишись на канал", desc: "Подпишись и останься", reward: 10 }
-            ];
-            for(let i=1; i<=30; i++) {
-                let t = tasks[i % tasks.length];
-                let reward = t.reward || 5;
-                grid.innerHTML += `
-                    <div class="task-item">
-                        <div>
-                            <div class="task-title">Задание #${i}: ${t.name}</div>
-                            <div class="task-desc">${t.desc}</div>
-                            <div style="font-size:13px; color:var(--accent-pink);">+${reward} Y-Coins</div>
-                        </div>
-                        <button onclick="openOfferWall()">Выполнить</button>
-                    </div>
-                `;
-            }
-        }
-        generateTasks();
-
-        // ===== ОТКРЫТИЕ СТЕНЫ ЗАДАНИЙ (MONETAG) =====
+        // ===== ССЫЛКИ НА ОФФЕРВОЛЛЫ =====
         function openOfferWall() {
-            const offerLink = 'https://omg10.com/4/11302575';
-            if (isInTelegram) {
-                window.Telegram.WebApp.openLink(offerLink);
-            } else {
-                window.open(offerLink, '_blank');
-            }
+            const offerLinks = [
+                'https://omg10.com/4/11302575',
+                'https://www.effectivecpmnetwork.com/vhzac380k?key=8458521c8995169f0b80adb22995dd6d'
+            ];
+            const randomLink = offerLinks[Math.floor(Math.random() * offerLinks.length)];
+            window.open(randomLink, '_blank');
         }
 
         // ===== ПЕРЕКЛЮЧЕНИЕ СТРАНИЦ =====
         function switchPage(pageId, btn) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
             btn.classList.add('active');
         }
 
-        // ===== ЗАЯВКА НА ВЫВОД (Отправка в Telegram) =====
+        // ===== ЗАЯВКА НА ВЫВОД =====
         function submitWithdraw() {
             let amount = parseInt(document.getElementById('w-amount').value);
             let method = document.getElementById('w-method').value;
@@ -314,38 +184,12 @@
             if (!amount || amount < 100) return alert('❌ Минимум: 100 Y-Coins');
             if (amount > balance) return alert('❌ Недостаточно Y-Coins');
 
-            // Списываем баланс
             balance -= amount;
             localStorage.setItem('user_balance', balance);
             updateUI();
 
-            // Формируем сообщение для бота
-            const message = `📩 **НОВАЯ ЗАЯВКА НА ВЫВОД**
-            
-👤 **Пользователь:** @${tgUsername} (ID: ${tgUserId})
-💰 **Сумма:** ${amount} Y-Coins
-🏦 **Способ:** ${method}
-👥 **Реферал:** ${ref}
-🕐 **Время:** ${new Date().toLocaleString()}`;
-
-            // Отправляем в Telegram (через ссылку с предзаполненным текстом)
-            const botToken = "ВАШ_ТОКЕН_БОТА"; // Токен твоего бота из @BotFather
-            const chatId = "ВАШ_ID"; // Твой Telegram ID (узнай через @userinfobot)
-            
-            const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}&parse_mode=Markdown`;
-            
-            fetch(url)
-                .then(response => {
-                    alert('✅ Заявка отправлена! Проверь чат с ботом.');
-                })
-                .catch(error => {
-                    alert('❌ Ошибка отправки заявки. Но деньги списаны. Запиши заявку вручную.');
-                });
-
+            alert('✅ Заявка отправлена! Ожидай ответа.');
             document.getElementById('w-amount').value = '';
-            document.getElementById('w-method').value = 'sbp';
-            document.getElementById('w-ref').value = 'none';
-            document.getElementById('admin-list').innerHTML = 'Ожидание отправки...';
         }
     </script>
 </body>
