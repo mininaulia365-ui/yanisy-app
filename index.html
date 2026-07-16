@@ -107,12 +107,11 @@
         .stat-row .label { color: #AAA; }
         .stat-row .value { color: var(--accent-pink); font-weight: bold; }
         #admin-panel {
-            display: none;
             background: var(--card-color);
             border: 2px solid var(--accent-pink);
             padding: 15px;
             border-radius: 12px;
-            margin: 20px;
+            margin-top: 20px;
         }
         #admin-panel h3 { color: var(--accent-pink); margin-bottom: 10px; }
         .admin-row {
@@ -166,7 +165,7 @@
         </div>
         <div id="admin-panel">
             <h3>🔐 Админ-панель</h3>
-            <div id="admin-list">Заявок пока нет.</div>
+            <div id="admin-list">Загрузка...</div>
         </div>
     </div>
 
@@ -223,11 +222,13 @@
     </div>
 
     <script>
+        // ===== ДАННЫЕ =====
         let balance = parseInt(localStorage.getItem('user_balance')) || 0;
         let done = parseInt(localStorage.getItem('tasks_done')) || 0;
         let pending = parseInt(localStorage.getItem('tasks_pending')) || 0;
         let withdrawRequests = JSON.parse(localStorage.getItem('withdraw_requests')) || [];
 
+        // ===== ОБНОВЛЕНИЕ UI =====
         function updateUI() {
             document.getElementById('user-balance').innerText = balance;
             document.getElementById('stat-balance').innerText = balance;
@@ -236,14 +237,23 @@
         }
         updateUI();
 
+        // ===== ГЕНЕРАЦИЯ 30 ЗАДАНИЙ =====
         function generateTasks() {
             const grid = document.getElementById('tasks-grid');
             grid.innerHTML = '';
             const tasks = [
-                { name: "Пройди опрос о фильмах", desc: "Ответь на 5 вопросов", reward: 15 },
-                { name: "Скачай игру-головоломку", desc: "Установи и открой приложение", reward: 20 },
-                { name: "Подпишись на канал", desc: "Останься подписанным", reward: 10 },
-                { name: "Зарегистрируйся на сайте", desc: "Пройди простую регистрацию", reward: 25 }
+                { name: "Пройди опрос о фильмах", desc: "Ответь на 5 вопросов о кино", reward: 15 },
+                { name: "Скачай приложение-игру", desc: "Установи и открой", reward: 20 },
+                { name: "Подпишись на канал YANISY", desc: "Останься на 7 дней", reward: 10 },
+                { name: "Пройди опрос о моде", desc: "Расскажи о своих предпочтениях", reward: 15 },
+                { name: "Скачай фитнес-приложение", desc: "Открой после установки", reward: 20 },
+                { name: "Подпишись на канал", desc: "Подпишись и останься", reward: 10 },
+                { name: "Пройди опрос о еде", desc: "Ответь на 5 вопросов", reward: 15 },
+                { name: "Скачай игру-головоломку", desc: "Установи и открой", reward: 20 },
+                { name: "Подпишись на Telegram-канал", desc: "Останься подписанным", reward: 10 },
+                { name: "Пройди опрос о путешествиях", desc: "Ответь на короткий опрос", reward: 15 },
+                { name: "Скачай полезное приложение", desc: "Установи и запусти", reward: 20 },
+                { name: "Подпишись на канал", desc: "Подпишись и останься", reward: 10 }
             ];
             for(let i=1; i<=30; i++) {
                 let t = tasks[i % tasks.length];
@@ -262,10 +272,12 @@
         }
         generateTasks();
 
+        // ===== ОТКРЫТИЕ СТЕНЫ ЗАДАНИЙ (Твоя ссылка Adsterra) =====
         function openOfferWall() {
-            window.open('https://omg10.com/4/11302575', '_blank');
+            window.open('https://www.effectivecpmnetwork.com/vhzac380k?key=8458521c8995169f0b80adb22995dd6d', '_blank');
         }
 
+        // ===== ПЕРЕКЛЮЧЕНИЕ СТРАНИЦ =====
         function switchPage(pageId, btn) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
@@ -273,6 +285,7 @@
             btn.classList.add('active');
         }
 
+        // ===== ЗАЯВКА НА ВЫВОД =====
         function submitWithdraw() {
             let amount = parseInt(document.getElementById('w-amount').value);
             let method = document.getElementById('w-method').value;
@@ -291,9 +304,12 @@
 
             alert('✅ Заявка отправлена! Ожидай ответа.');
             document.getElementById('w-amount').value = '';
+            document.getElementById('w-method').value = 'sbp';
+            document.getElementById('w-ref').value = 'none';
             showAdminPanel();
         }
 
+        // ===== АДМИН-ПАНЕЛЬ (Видна только тебе по юзернейму @HEDYPA) =====
         function showAdminPanel() {
             let tgUsername = "";
             if (window.Telegram && window.Telegram.WebApp) {
