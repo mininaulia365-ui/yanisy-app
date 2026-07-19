@@ -2,195 +2,112 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>YANISY</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YANISY || freelance</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; }
-        body {
-            background: #0A0A0A;
-            color: #fff;
-            padding-bottom: 80px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #fdfbf7; color: #333; padding: 16px; max-width: 480px; margin: 0 auto; }
+        h1 { text-align: center; color: #8a6b5a; margin-bottom: 8px; }
+        .nav { display: flex; gap: 4px; margin-bottom: 16px; }
+        .nav button {
+            flex: 1; background: #e8d5c4; border: none; padding: 8px 12px;
+            border-radius: 20px; font-weight: 600; color: #3d2c1e; cursor: pointer;
         }
-        #balance-bar {
-            width: 100%;
-            padding: 15px 20px;
-            background: #1A1A1A;
-            text-align: center;
-            font-size: 20px;
-            font-weight: bold;
-            border-bottom: 1px solid #333;
-        }
-        #balance-bar span { color: #FF007F; }
-        .page { display: none; width: 100%; max-width: 400px; padding: 20px; }
+        .nav button.active { background: #8a6b5a; color: #fff; }
+        .page { display: none; }
         .page.active { display: block; }
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background: #1A1A1A;
-            border-top: 1px solid #333;
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 0 20px;
+        .task-card {
+            background: #fff; padding: 14px; border-radius: 14px; margin-bottom: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05); cursor: pointer;
         }
-        .nav-btn {
-            background: none;
-            border: none;
-            color: #666;
-            font-size: 12px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            cursor: pointer;
+        .task-card h3 { margin-bottom: 4px; }
+        .task-card .price { font-weight: 600; color: #5a8a6a; }
+        .profile-card { background: #fff; padding: 16px; border-radius: 14px; }
+        .lb-item {
+            display: flex; justify-content: space-between; padding: 6px 0;
+            border-bottom: 1px solid #eee;
         }
-        .nav-btn.active { color: #FF007F; }
-        .btn-pink {
-            display: block;
-            width: 100%;
-            padding: 14px;
-            margin: 10px 0;
-            border-radius: 12px;
-            border: none;
-            background: #FF007F;
-            color: #fff;
-            font-size: 16px;
-            font-weight: bold;
-            text-align: center;
-            cursor: pointer;
-        }
-        .btn-dark {
-            display: block;
-            width: 100%;
-            padding: 14px;
-            margin: 10px 0;
-            border-radius: 12px;
-            border: 1px solid #444;
-            background: #1A1A1A;
-            color: #fff;
-            font-size: 16px;
-            text-align: center;
-            cursor: pointer;
-        }
-        .input-field {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid #444;
-            background: #1A1A1A;
-            color: #fff;
-            margin-bottom: 15px;
-        }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { color: #AAA; display: block; margin-bottom: 5px; }
-        .form-group select { background: #1A1A1A; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 8px; width: 100%; }
+        .btn { background: #e8d5c4; border: none; padding: 6px 14px; border-radius: 20px; cursor: pointer; }
+        .btn.primary { background: #8a6b5a; color: #fff; }
     </style>
 </head>
 <body>
-
-    <div id="balance-bar">🪙 <span id="user-balance">0</span> Y-Coins</div>
-
-    <div id="page-tasks" class="page active">
-        <h3 style="margin-bottom: 15px;">📋 Задания</h3>
-        <div style="background: #FF007F; padding: 15px; border-radius: 12px; margin-bottom: 20px; color: #fff;">
-            ⚠️ <b>Важно:</b> Перед переходом к заданиям выключи VPN, иначе они не откроются!
+    <div id="app">
+        <h1>YANISY</h1>
+        <div class="nav">
+            <button class="active" onclick="showPage('tasks')">📋 Задания</button>
+            <button onclick="showPage('profile')">👤 Профиль</button>
+            <button onclick="showPage('leaderboard')">🏆 Лидеры</button>
         </div>
-        <button class="btn-pink" onclick="openOfferWall()">🚀 Перейти к заданиям</button>
-    </div>
-
-    <div id="page-stats" class="page">
-        <h3 style="margin-bottom: 15px;">📊 Статистика</h3>
-        <div class="btn-dark">💰 Баланс: <span id="stat-balance">0</span> Y-Coins</div>
-    </div>
-
-    <div id="page-support" class="page">
-        <h3 style="margin-bottom: 15px;">🆘 Поддержка</h3>
-        <button class="btn-pink" onclick="window.open('https://t.me/HEDYPA', '_blank')">Написать создателю</button>
-    </div>
-
-    <div id="page-withdraw" class="page">
-        <h3 style="margin-bottom: 15px;">💸 Вывод</h3>
-        <div class="form-group">
-            <label>Сумма (Y-Coins)</label>
-            <input class="input-field" id="w-amount" placeholder="Например: 100" type="number">
+        <div id="tasks" class="page active">
+            <div id="taskList"></div>
         </div>
-        <div class="form-group">
-            <label>Куда вывести?</label>
-            <select class="input-field" id="w-method">
-                <option value="sbp">СБП</option>
-                <option value="tinkoff">Тинькофф</option>
-                <option value="sber">Сбербанк</option>
-                <option value="alfa">Альфа-Банк</option>
-            </select>
+        <div id="profile" class="page">
+            <div class="profile-card">
+                <h2>Мой профиль</h2>
+                <p><b>Баланс:</b> <span id="profileBalance">0</span> ₽</p>
+                <p><b>Выполнено:</b> <span id="tasksDone">0</span> заданий</p>
+                <p><b>Мой промокод:</b> <span id="myPromo">YANISY_123</span></p>
+                <button class="btn primary" onclick="addCoins()">+10 коинов (тест)</button>
+            </div>
         </div>
-        <div class="form-group">
-            <label>Кто тебя пригласил?</label>
-            <select class="input-field" id="w-ref">
-                <option value="none">— Самостоятельно —</option>
-                <option value="ref1">Реферал №1</option>
-                <option value="ref2">Реферал №2</option>
-                <option value="ref3">Реферал №3</option>
-                <option value="ref4">Реферал №4</option>
-            </select>
+        <div id="leaderboard" class="page">
+            <div id="lbList"></div>
         </div>
-        <button class="btn-pink" onclick="submitWithdraw()">📤 Подать заявку</button>
     </div>
-
-    <div class="bottom-nav">
-        <button class="nav-btn active" onclick="switchPage('page-tasks', this)">📋 Задания</button>
-        <button class="nav-btn" onclick="switchPage('page-stats', this)">📊 Статистика</button>
-        <button class="nav-btn" onclick="switchPage('page-support', this)">🆘 Поддержка</button>
-        <button class="nav-btn" onclick="switchPage('page-withdraw', this)">💸 Вывод</button>
-    </div>
-
     <script>
-        // ===== БАЛАНС =====
-        let balance = parseInt(localStorage.getItem('user_balance')) || 0;
+        const STORAGE_KEY = 'yanisy_data';
+        const tasks = [
+            { name: 'Йога', price: 45, link: 'https://singingfiles.com/show.php?l=0&u=2542250&id=74923', desc: 'Скачай игру и открой' },
+            { name: 'Walmart', price: 70, link: 'https://singingfiles.com/show.php?l=0&u=2542250&id=75095', desc: 'Введи номер телефона' },
+            { name: 'Opera GX', price: 140, link: 'https://singingfiles.com/show.php?l=0&u=2542250&id=75068', desc: 'Установи браузер' }
+        ];
 
-        function updateUI() {
-            document.getElementById('user-balance').innerText = balance;
-            document.getElementById('stat-balance').innerText = balance;
-        }
-        updateUI();
+        let data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || { balance: 0, tasksDone: 0 };
 
-        // ===== ССЫЛКИ НА ОФФЕРВОЛЛЫ =====
-        function openOfferWall() {
-            const offerLinks = [
-                'https://omg10.com/4/11302575',
-                'https://www.effectivecpmnetwork.com/vhzac380k?key=8458521c8995169f0b80adb22995dd6d'
-            ];
-            const randomLink = offerLinks[Math.floor(Math.random() * offerLinks.length)];
-            window.open(randomLink, '_blank');
-        }
+        function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
 
-        // ===== ПЕРЕКЛЮЧЕНИЕ СТРАНИЦ =====
-        function switchPage(pageId, btn) {
+        function showPage(id) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
-            btn.classList.add('active');
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
         }
 
-        // ===== ЗАЯВКА НА ВЫВОД =====
-        function submitWithdraw() {
-            let amount = parseInt(document.getElementById('w-amount').value);
-            let method = document.getElementById('w-method').value;
-            let ref = document.getElementById('w-ref').value;
-
-            if (!amount || amount < 100) return alert('❌ Минимум: 100 Y-Coins');
-            if (amount > balance) return alert('❌ Недостаточно Y-Coins');
-
-            balance -= amount;
-            localStorage.setItem('user_balance', balance);
-            updateUI();
-
-            alert('✅ Заявка отправлена! Ожидай ответа.');
-            document.getElementById('w-amount').value = '';
+        function renderTasks() {
+            const el = document.getElementById('taskList');
+            el.innerHTML = tasks.map(t => `
+                <div class="task-card" onclick="window.open('${t.link}', '_blank')">
+                    <h3>${t.name}</h3>
+                    <p>${t.desc}</p>
+                    <span class="price">💰 ${t.price} ₽</span>
+                </div>
+            `).join('');
         }
+
+        function updateProfile() {
+            document.getElementById('profileBalance').textContent = data.balance;
+            document.getElementById('tasksDone').textContent = data.tasksDone;
+            document.getElementById('myPromo').textContent = 'YANISY_' + Math.floor(Math.random() * 10000);
+        }
+
+        function addCoins() {
+            data.balance += 10;
+            data.tasksDone += 1;
+            saveData();
+            updateProfile();
+        }
+
+        function renderLeaderboard() {
+            const el = document.getElementById('lbList');
+            el.innerHTML = `<p>🥇 Место 1: Ты — ${data.balance} ₽</p>
+                            <p>🥈 Место 2: Аня — 120 ₽</p>
+                            <p>🥉 Место 3: Катя — 90 ₽</p>`;
+        }
+
+        renderTasks();
+        updateProfile();
+        renderLeaderboard();
     </script>
 </body>
 </html>
