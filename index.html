@@ -7,28 +7,29 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Segoe UI', sans-serif;
-            background: #f8f5f2;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f2ef;
             color: #1a1a1a;
-            padding: 20px;
+            padding: 20px 16px;
             max-width: 480px;
             margin: 0 auto;
+            padding-bottom: 100px;
         }
         .hidden { display: none; }
-        .header-balance {
+        .header {
             background: #ffffff;
-            border-radius: 40px;
-            padding: 12px 20px;
+            border-radius: 20px;
+            padding: 16px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            margin-bottom: 12px;
         }
-        .header-balance h1 { font-size: 22px; color: #4a3a2e; margin: 0; }
-        .coin-pill {
-            background: #e6ddd5;
-            padding: 6px 14px;
+        .header h1 { font-size: 20px; font-weight: 700; color: #2b2b2b; }
+        .header-balance {
+            background: #e8e0da;
+            padding: 6px 16px;
             border-radius: 30px;
             font-weight: 600;
             color: #3d2c1e;
@@ -41,29 +42,29 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.03);
             border-left: 4px solid #4a7a6b;
         }
-        .welcome-card h2 { font-size: 18px; color: #4a3a2e; }
+        .welcome-card h2 { font-size: 18px; color: #2b2b2b; }
         .welcome-card p { color: #5f4f3f; margin-top: 6px; font-size: 14px; }
         .section-title {
             font-size: 16px;
-            font-weight: 700;
-            color: #4a3a2e;
+            font-weight: 600;
+            color: #2b2b2b;
             margin: 16px 0 8px 0;
         }
         .task-card {
             background: #ffffff;
-            border-radius: 16px;
-            padding: 14px 18px;
-            margin-bottom: 10px;
+            border-radius: 14px;
+            padding: 14px 16px;
+            margin-bottom: 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.03);
             cursor: pointer;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
         }
         .task-card:active { background: #f2ece8; }
-        .task-left h4 { font-size: 16px; margin-bottom: 2px; }
+        .task-left h4 { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
         .task-left p { font-size: 13px; color: #6f5f4f; }
-        .task-right { font-weight: 700; color: #4a7a6b; font-size: 16px; }
+        .task-right { font-weight: 600; color: #4a7a6b; font-size: 15px; }
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -72,85 +73,101 @@
             background: #ffffff;
             display: flex;
             justify-content: space-around;
-            padding: 10px 0 18px 0;
+            align-items: center;
+            padding: 8px 0 18px 0;
             border-top: 1px solid #e8e2dc;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.03);
+            box-shadow: 0 -2px 12px rgba(0,0,0,0.04);
         }
         .nav-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            font-size: 12px;
+            font-size: 11px;
             color: #8a7a6a;
             cursor: pointer;
             padding: 4px 12px;
             border-radius: 12px;
         }
-        .nav-item.active { color: #4a3a2e; font-weight: 600; background: #f2ece8; }
+        .nav-item.active { color: #2b2b2b; font-weight: 500; background: #f2ece8; }
         .nav-item span { font-size: 20px; margin-bottom: 2px; }
-        .page { display: none; padding-bottom: 80px; }
+        .page { display: none; }
         .page.active { display: block; }
         .profile-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
-        }
-        .profile-card { background: #fff; border-radius: 16px; padding: 18px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); }
-        .btn-primary {
-            background: #4a7a6b;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 30px;
-            font-weight: 600;
-            width: 100%;
-            margin-top: 12px;
-            cursor: pointer;
-        }
-        .lb-row {
             display: flex;
             justify-content: space-between;
             padding: 8px 0;
             border-bottom: 1px solid #eee;
         }
+        .profile-card {
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 10px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+        }
+        .btn-primary {
+            background: #4a7a6b;
+            color: #ffffff;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #4a7a6b;
+            color: #4a7a6b;
+            padding: 10px 16px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .lb-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid #eee;
+        }
         .small-text { font-size: 13px; color: #6f5f4f; }
+        .emoji-big { font-size: 28px; line-height: 1; }
+        .flex-center { display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
-    <!-- ПОДПИСКА -->
     <div id="subscriptionCheck" class="hidden">
-        <div style="background:#fff; border-radius:20px; padding:30px 20px; text-align:center;">
-            <h2>📢 Подпишись на канал</h2>
-            <p style="margin:10px 0 20px;">Чтобы выполнять задания, подпишись на наш канал:</p>
+        <div style="background:#ffffff; border-radius:20px; padding:30px 20px; text-align:center; box-shadow:0 2px 8px rgba(0,0,0,0.03);">
+            <div class="emoji-big" style="margin-bottom:12px;">📢</div>
+            <h2 style="margin-bottom:6px;">Подпишись на канал</h2>
+            <p style="color:#6f5f4f; margin-bottom:20px; font-size:14px;">Чтобы выполнять задания, подпишись на наш канал:</p>
             <a href="https://t.me/YANISY_FREELANCE" target="_blank">
                 <button class="btn-primary">📲 Перейти в канал</button>
             </a>
-            <button style="margin-top:12px; background:#ddd; border:none; padding:10px 20px; border-radius:30px; font-weight:600; width:100%;" onclick="checkSubscription()">✅ Я подписался(ась)</button>
+            <button class="btn-outline" style="margin-top:10px;" onclick="checkSubscription()">✅ Я подписался(ась)</button>
         </div>
     </div>
 
-    <!-- ОСНОВНОЕ ПРИЛОЖЕНИЕ -->
     <div id="mainApp" class="hidden">
-
-        <!-- Шапка -->
-        <div class="header-balance">
+        <div class="header">
             <h1>YANISY</h1>
-            <span class="coin-pill" id="headerBalance">0 ₽</span>
+            <span class="header-balance" id="headerBalance">0 ₽</span>
         </div>
 
-        <!-- Приветствие -->
-        <div class="welcome-card">
+        <div class="welcome-card" id="welcomeBlock">
             <h2>👋 Привет, <span id="userName">Гость</span>!</h2>
             <p>Выполняй задания и зарабатывай коины!</p>
         </div>
 
-        <!-- Задания -->
         <div class="section-title">📋 Доступные задания</div>
         <div id="taskList"></div>
 
-        <!-- Нижняя навигация -->
         <div class="bottom-nav">
             <div class="nav-item active" onclick="switchTab('tasks')">
                 <span>📋</span> Задания
@@ -161,14 +178,16 @@
             <div class="nav-item" onclick="switchTab('leaderboard')">
                 <span>🏆</span> Статистика
             </div>
+            <div class="nav-item" onclick="switchTab('withdraw')">
+                <span>💸</span> Вывод
+            </div>
         </div>
 
-        <!-- Страницы -->
         <div id="tasks" class="page active"></div>
 
         <div id="profile" class="page">
             <div class="profile-card">
-                <h3>👤 Мой профиль</h3>
+                <h3 style="margin-bottom:8px;">👤 Мой профиль</h3>
                 <div class="profile-row"><span>Имя:</span> <span id="pName">—</span></div>
                 <div class="profile-row"><span>Баланс:</span> <span id="pBalance">0 ₽</span></div>
                 <div class="profile-row"><span>Выполнено:</span> <span id="pTasks">0</span></div>
@@ -180,14 +199,24 @@
 
         <div id="leaderboard" class="page">
             <div class="profile-card">
-                <h3>🏆 Статистика</h3>
+                <h3 style="margin-bottom:8px;">🏆 Статистика</h3>
                 <div id="lbList"></div>
+            </div>
+        </div>
+
+        <div id="withdraw" class="page">
+            <div class="profile-card">
+                <h3 style="margin-bottom:8px;">💸 Вывод средств</h3>
+                <p style="color:#6f5f4f; font-size:14px; margin-bottom:12px;">Для вывода средств напиши в личку:</p>
+                <a href="https://t.me/HEDYPA" target="_blank">
+                    <button class="btn-primary">✉️ @HEDYPA</button>
+                </a>
+                <p style="color:#6f5f4f; font-size:13px; margin-top:12px;">После выполнения задания сделай скриншот и отправь в личку.</p>
             </div>
         </div>
     </div>
 
     <script>
-        // === БАЗА ===
         const STORAGE_KEY = 'yanisy_data';
         const WORDS = ["сапог","банан","котик","пирожок","зонтик","облако","радуга","карандаш","книжка","чашка","тарелка","вилка","ложка","подушка","одеяло","шкаф","стул","стол","рюкзак","тетрадь","ручка","ластик","линейка","фломастер","краски","кисточка","палитра","мольберт","ножницы","клей","бумага","конверт","открытка","свеча","фонарик","компас","карта","глобус","микрофон","наушники","колонка","гитара","барабан","скрипка","флейта","клавиши","нота","мелодия","ритм","танец","солнце","луна","звезда","планета","ракета","космос","метеор","галактика","туманность","орбита","спутник","марс","венера","юпитер","сатурн","уран","нептун","плутон","астероид","комета","шоколад","конфета","зефир","мармелад","печенье","кекс","торт","рулет","вафля","пряник","заяц","белка","ёжик","сова","орёл","сокол","чайка","воробей","синица","снегирь","снег","дождь","ветер","гроза","молния","туман","иней","роса","туча","град"];
 
@@ -203,7 +232,6 @@
 
         function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }
 
-        // === ЗАДАНИЯ ===
         const tasks = [
             { id: 1, title: '🧘 Йога', desc: 'Скачай и открой', price: 45, link: 'https://singingfiles.com/show.php?l=0&u=2542250&id=74923' },
             { id: 2, title: '🛒 Walmart (iPhone)', desc: 'Введи номер телефона', price: 70, link: 'https://singingfiles.com/show.php?l=0&u=2542250&id=74764' },
@@ -216,14 +244,12 @@
             { id: 9, title: '📌 Авито', desc: 'Напиши в личку @HEDYPA', price: 80, link: 'https://t.me/HEDYPA' }
         ];
 
-        // === ЗАПУСК ===
         function init() {
             if (!db.hasStarted) {
                 let name = prompt('🎀 Как тебя зовут?');
                 let promo = prompt('🔑 Введи промокод (если есть):');
                 if (promo && promo.length > 2) {
                     db.balance += 15;
-                    // Увеличиваем счётчик приведённых у того, чей промокод
                     let allUsers = JSON.parse(localStorage.getItem('yanisy_all_users')) || {};
                     if (allUsers[promo]) {
                         allUsers[promo].referrals += 1;
@@ -233,7 +259,6 @@
                 db.name = name || 'Гость';
                 db.hasStarted = true;
                 save();
-                // Сохраняем этого пользователя в общую базу
                 let allUsers = JSON.parse(localStorage.getItem('yanisy_all_users')) || {};
                 allUsers[db.promo] = { name: db.name, referrals: 0 };
                 localStorage.setItem('yanisy_all_users', JSON.stringify(allUsers));
@@ -255,7 +280,6 @@
             render();
         }
 
-        // === АДМИНКА ===
         const ADMIN_ID = "7747891963";
         function checkAdmin() {
             const user = window.Telegram?.WebApp?.initDataUnsafe?.user;
@@ -272,7 +296,6 @@
             }
         }
 
-        // === НАВИГАЦИЯ ===
         function switchTab(id) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(id).classList.add('active');
@@ -280,12 +303,10 @@
             event.target.closest('.nav-item').classList.add('active');
         }
 
-        // === ОТРИСОВКА ===
         function render() {
             document.getElementById('userName').textContent = db.name;
             document.getElementById('headerBalance').textContent = db.balance + ' ₽';
 
-            // Задания
             const taskList = document.getElementById('taskList');
             taskList.innerHTML = tasks.map(t => `
                 <div class="task-card" onclick="window.open('${t.link}', '_blank')">
@@ -297,17 +318,14 @@
                 </div>
             `).join('');
 
-            // Профиль
             document.getElementById('pName').textContent = db.name;
             document.getElementById('pBalance').textContent = db.balance + ' ₽';
             document.getElementById('pTasks').textContent = db.tasksDone;
             document.getElementById('pPromo').textContent = db.promo;
-            // Проверяем приведённых
             let allUsers = JSON.parse(localStorage.getItem('yanisy_all_users')) || {};
             let refCount = allUsers[db.promo]?.referrals || 0;
             document.getElementById('pReferrals').textContent = refCount;
 
-            // Лидерборд
             const lb = document.getElementById('lbList');
             let mock = Object.entries(allUsers).map(([code, data]) => ({
                 name: data.name || 'Аноним',
